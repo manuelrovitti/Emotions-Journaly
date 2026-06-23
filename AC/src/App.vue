@@ -1,7 +1,12 @@
 <script setup>
-import HelloWorld from './components/HelloWorld.vue'
+  import AppBar from './components/AppBar.vue'
 </script>
 
 <template>
-  <HelloWorld />
+  <AppBar />
+  <RouterView />
 </template>
+
+<style scoped>
+
+</style>
