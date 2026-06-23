@@ -42,7 +42,7 @@ const navLinks = [
             v-for="link in navLinks"
             :key="link.name"
             :href="link.href"
-            class="text-base font-medium text-gray-600 hover:text-blue-900 transition-colors duration-200"
+            class="text-base font-medium text-black hover:text-red-900 transition-colors duration-200"
           >
             {{ link.name }}
           </a>
@@ -78,7 +78,7 @@ const navLinks = [
           :key="link.name"
           :href="link.href"
           @click="isMenuOpen = false"
-          class="block text-base font-medium text-gray-700 py-2 hover:text-blue-900 transition"
+          class="block text-base font-medium text-black py-2 hover:text-red-900 transition"
         >
           {{ link.name }}
         </a>
