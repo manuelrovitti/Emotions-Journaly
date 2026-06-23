@@ -4,6 +4,7 @@
 
     import EmotionForm from "../components/EmotionForm.vue";
     import Dashboard from "../components/Dashboard.vue";
+    import HeroCarousel from "../components/HeroCarousel.vue";
 
 
     function handleAnalyze(data) {
@@ -14,8 +15,11 @@
 </script>
 
 <template>
-  <div class="min-h-screen bg-slate-100 p-6">
-    <div class="mx-auto max-w-7xl space-y-2">
+  <div class="min-h-screen bg-slate-100">
+    
+    <HeroCarousel />
+
+    <div class="mx-auto w-full max-w-7xl px-6 py-6 space-y-6">
 
       <EmotionForm
         @analyze="handleAnalyze"
@@ -30,5 +34,6 @@
       />
 
     </div>
+
   </div>
 </template>

@@ -1,17 +1,16 @@
 <template>
-  <div class="rounded-2xl bg-white p-6 shadow-sm">
+  <div class="w-full max-w-6xl mx-auto rounded-2xl bg-white p-8 shadow-md">
     <h2 class="mb-6 text-2xl font-semibold text-slate-800">
-      Nuova Analisi
+      New Thoughts
     </h2>
 
-    <form
-      @submit.prevent="submitForm"
-      class="space-y-4"
-    >
+    <form @submit.prevent="submitForm" class="space-y-4">
+
+      <!-- NAME + SURNAME -->
       <div class="grid gap-4 md:grid-cols-2">
         <div>
           <label class="mb-2 block text-sm font-medium">
-            Nome
+            Name
           </label>
 
           <input
@@ -24,7 +23,7 @@
 
         <div>
           <label class="mb-2 block text-sm font-medium">
-            Cognome
+            Surname
           </label>
 
           <input
@@ -36,48 +35,61 @@
         </div>
       </div>
 
+      <!-- TEXT AREA -->
       <div>
         <label class="mb-2 block text-sm font-medium">
-          Come ti senti oggi?
+          How are you feeling today?
         </label>
 
         <textarea
           v-model="form.text"
           rows="6"
           placeholder="Scrivi qui i tuoi pensieri..."
-          class="w-full rounded-lg border border-slate-300 px-4 py-3 focus:border-indigo-500 focus:outline-none"
+          class="w-full resize-none rounded-lg border border-slate-300 px-4 py-3 focus:border-indigo-500 focus:outline-none"
         />
       </div>
 
+      <!-- BUTTON -->
       <button
         type="submit"
-        class="rounded-lg bg-indigo-600 px-6 py-3 font-semibold text-white transition hover:bg-indigo-700"
+        :disabled="!isValid"
+        class="rounded-lg px-6 py-3 font-semibold text-white transition"
+        :class="isValid
+          ? 'bg-indigo-600 hover:bg-indigo-700'
+          : 'bg-gray-400 cursor-not-allowed'"
       >
-        Analizza Emozione
+        Analyze Emotion
       </button>
     </form>
 
+    <!-- RESULT -->
     <div
       v-if="emotion"
       class="mt-6 rounded-xl bg-slate-50 p-4"
     >
       <p class="text-sm text-slate-500">
-        Emozione rilevata
+        Emotion detected
       </p>
 
       <p class="mt-2 text-xl font-bold">
         {{ emotion }}
       </p>
+      <p class="text-lg font-semibold text-indigo-600">
+        Confidence: {{ confidence }}%
+      </p>
     </div>
   </div>
 </template>
 
+
 <script setup>
-import { ref } from "vue";
+import { ref, computed } from "vue";
 
 const emit = defineEmits(["analyze"]);
 
 const emotion = ref("");
+const loading = ref(false);
+const confidence = ref(null);
 
 const form = ref({
   name: "",
@@ -85,9 +97,45 @@ const form = ref({
   text: "",
 });
 
-function submitForm() {
-  emit("analyze", form.value);
+/* ✅ VALIDAZIONE FORM */
+const isValid = computed(() => {
+  return (
+    form.value.name.trim() !== "" &&
+    form.value.surname.trim() !== "" &&
+    form.value.text.trim() !== ""
+  );
+});
 
-  emotion.value = "😰 Stress";
+async function submitForm() {
+  if (!isValid.value) return;
+
+  loading.value = true;
+
+  try {
+    const response = await fetch("http://localhost:8000/analyze", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(form.value),
+    });
+
+    const data = await response.json();
+
+    emotion.value = data.emotion;
+    confidence.value = data.confidence;
+
+    emit("analyze", {
+      ...form.value,
+      emotion: data.emotion,
+      confidence: data.confidence,
+    });
+
+  } catch (err) {
+    emotion.value = "Errore API";
+    console.error(err);
+  }
+
+  loading.value = false;
 }
 </script>
