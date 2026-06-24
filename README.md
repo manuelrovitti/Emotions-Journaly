@@ -9,5 +9,5 @@ su AC:
 - npm run dev -- --host
 
 su AC_B:
-- pip install openpyxl
+- python -m pip install fastapi pydantic transformers torch pandas uvicorn[standard]
 - uvicorn server:app --host 0.0.0.0 --port 8000

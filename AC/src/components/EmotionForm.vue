@@ -46,7 +46,7 @@
           rows="6"
           placeholder="Scrivi qui i tuoi pensieri..."
           class="w-full resize-none rounded-lg border border-slate-300 px-4 py-3 focus:border-indigo-500 focus:outline-none"
-        />
+        ></textarea>
       </div>
 
       <!-- BUTTON -->
@@ -74,6 +74,7 @@
       <p class="mt-2 text-xl font-bold">
         {{ emotion }}
       </p>
+
       <p class="text-lg font-semibold text-indigo-600">
         Confidence: {{ confidence }}%
       </p>
@@ -81,14 +82,12 @@
   </div>
 </template>
 
-
 <script setup>
 import { ref, computed } from "vue";
 
 const emit = defineEmits(["analyze"]);
 
 const emotion = ref("");
-const loading = ref(false);
 const confidence = ref(null);
 
 const form = ref({
@@ -109,7 +108,6 @@ const isValid = computed(() => {
 async function submitForm() {
   if (!isValid.value) return;
 
-  loading.value = true;
 
   try {
     const response = await fetch("http://localhost:8000/analyze", {
@@ -125,10 +123,13 @@ async function submitForm() {
     emotion.value = data.emotion;
     confidence.value = data.confidence;
 
-    emit("analyze", {
-      ...form.value,
-      emotion: data.emotion,
-      confidence: data.confidence,
+  emit("analyze", {
+    name: form.value.name,
+    surname: form.value.surname,
+    text: form.value.text,
+    emotion: data.emotion,
+    confidence: data.confidence,
+
     });
 
   } catch (err) {

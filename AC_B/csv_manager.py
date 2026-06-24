@@ -2,7 +2,6 @@ import csv
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent
-
 DATA_DIR = BASE_DIR / "data"
 DATA_DIR.mkdir(exist_ok=True)
 
@@ -35,3 +34,17 @@ def save_analysis(name, surname, text, emotion, confidence, gt=""):
             confidence,
             gt
         ])
+
+def read_analysis(name=None, surname=None):
+    if not FILE_NAME.exists():
+        return []
+
+    with open(FILE_NAME, "r", newline="", encoding="utf-8") as file:
+        reader = csv.DictReader(file)
+        results = []
+
+        for row in reader:
+            if (name is None or row["Name"] == name) and (surname is None or row["Surname"] == surname):
+                results.append(row["Emotion"])
+
+        return results

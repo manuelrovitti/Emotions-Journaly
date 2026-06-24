@@ -2,11 +2,14 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 from transformers import pipeline
 from fastapi.middleware.cors import CORSMiddleware
-from csv_manager import save_analysis
+from csv_manager import save_analysis, read_analysis
+
+import pandas as pd
+from pathlib import Path
 
 app = FastAPI()
 
-# CORS (fondamentale per Vue)
+# CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -21,13 +24,19 @@ ekman_pipeline = pipeline(
     model="arpanghoshal/EkmanClassifier"
 )
 
+# CSV path
+DATA_FILE = Path("data/dataset.csv")
+
 # INPUT
 class InputText(BaseModel):
     name: str
     surname: str
     text: str
 
-# API
+
+# =========================
+# ANALYZE + SAVE
+# =========================
 @app.post("/analyze")
 def analyze(data: InputText):
 
@@ -48,3 +57,7 @@ def analyze(data: InputText):
         "emotion": emotion,
         "confidence": confidence
     }
+
+@app.get("/history/{name}/{surname}")
+def get_history(name: str, surname: str):
+    return read_analysis(name=name, surname=surname)
