@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 from transformers import pipeline
 from fastapi.middleware.cors import CORSMiddleware
+from csv_manager import save_analysis
 
 app = FastAPI()
 
@@ -32,7 +33,18 @@ def analyze(data: InputText):
 
     result = ekman_pipeline(data.text)[0]
 
+    emotion = result["label"]
+    confidence = float(result["score"])
+
+    save_analysis(
+        data.name,
+        data.surname,
+        data.text,
+        emotion,
+        confidence
+    )
+
     return {
-        "emotion": result["label"],
-        "confidence": float(result["score"])
+        "emotion": emotion,
+        "confidence": confidence
     }

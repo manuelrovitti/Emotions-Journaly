@@ -9,4 +9,5 @@ su AC:
 - npm run dev -- --host
 
 su AC_B:
+- pip install openpyxl
 - uvicorn server:app --host 0.0.0.0 --port 8000

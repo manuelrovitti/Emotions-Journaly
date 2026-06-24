@@ -1,7 +1,6 @@
 <template>
-  <div class="grid gap-3 lg:grid-cols-2">
+  <div class="w-full max-w-6xl mx-auto">
 
-    <!-- DASHBOARD -->
     <div class="rounded-2xl bg-white p-6 shadow-sm">
       <h2 class="mb-2 text-2xl font-semibold">
         Dashboard
@@ -51,6 +50,7 @@
 
       </div>
     </div>
+
   </div>
 </template>
 
