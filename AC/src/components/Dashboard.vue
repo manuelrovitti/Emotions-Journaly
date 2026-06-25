@@ -59,7 +59,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from "vue";
+import { ref, computed, watch } from "vue";
 
 const history = ref([]);
 
@@ -72,52 +72,55 @@ const props = defineProps({
    FETCH HISTORY
 ========================= */
 async function loadHistory() {
-  try {
-    const res = await fetch("http://localhost:8000/history/" + props.name + "/" + props.surname);
-    const data = await res.json();
+  console.log("▶ loadHistory chiamata");
 
-    history.value = data;
-  } catch (err) {
-    console.error("Errore fetch history:", err);
-  }
+  const url = `http://localhost:8000/history/${props.name}/${props.surname}`;
+  console.log("URL:", url);
+
+  const res = await fetch(url);
+
+  console.log("STATUS:", res.status);
+
+  const text = await res.text();
+  console.log("RAW RESPONSE:", text);
+
+  const data = JSON.parse(text);
+  console.log("PARSED DATA:", data);
+
+  history.value = data;
 }
 
 const total = computed(() => history.value.length);
 
 const stats = computed(() => {
-  if (!history.value || history.value.length === 0) {
-    return { happy: 0, neutral: 0, sad: 0 };
-  }
+  const counts = {
+    joy: 0,
+    neutral: 0,
+    sadness: 0,
+  };
 
-  let happy = 0;
-  let neutral = 0;
-  let sad = 0;
-  for (const entry of history.value) {
-    switch (entry.emotion) {
-      case "joy":
-        happy++;
-        break;
-      case "neutral":
-        neutral++;
-        break;
-      case "sadness":
-        sad++;
-        break;
+  for (const emotion of history.value || []) {
+    if (counts[emotion] !== undefined) {
+      counts[emotion]++;
     }
   }
 
-  const total = history.value.length;
+  const total = history.value.length || 1;
 
   return {
-    happy: Math.round((happy / total) * 100),
-    neutral: Math.round((neutral / total) * 100),
-    sad: Math.round((sad / total) * 100),
+    happy: Math.round((counts.joy / total) * 100),
+    neutral: Math.round((counts.neutral / total) * 100),
+    sad: Math.round((counts.sadness / total) * 100),
   };
 });
 
 
-onMounted(() => {
-  loadHistory();
-});
+  watch(
+    () => props.name + props.surname,
+    async () => {
+      await loadHistory();
+    },
+    { immediate: true }
+  );
 
 </script>
