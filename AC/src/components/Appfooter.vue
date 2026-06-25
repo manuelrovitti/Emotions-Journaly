@@ -3,17 +3,11 @@ const currentYear = new Date().getFullYear()
 
 const footerSections = [
   {
-    title: 'Servizi',
+    title: 'Website',
     links: [
-      { name: 'Servizi', href: '/servizi' },
-      { name: 'Consulenza', href: '#' },
-      { name: 'Sviluppo Web', href: '#' },
-    ],
-  },
-  {
-    title: 'Azienda',
-    links: [
+      { name: 'Home', href: '/' },
       { name: 'About', href: '/about' },
+      { name: 'Diary', href: '/diary' },
     ],
   },
   {
@@ -29,7 +23,7 @@ const footerSections = [
 
 <template>
   <!-- FULL WIDTH FOOTER -->
-  <footer class="w-full bg-white border-t border-gray-100">
+  <footer class="w-full bg-blue-200 border-t border-red-900/10">
 
     <!-- CONTENT WRAPPER (CENTRATO MA NON LIMITANTE) -->
     <div class="w-full px-6 lg:px-10 py-12 lg:py-16">
@@ -44,7 +38,7 @@ const footerSections = [
             Emotional<span class="text-red-800"> Journal</span>
           </a>
 
-          <p class="text-sm text-gray-500 max-w-sm leading-relaxed">
+          <p class="text-sm text-black max-w-sm leading-relaxed">
             Keep your emotions journal up to date.
           </p>
 
@@ -75,7 +69,7 @@ const footerSections = [
           :key="section.title"
           class="space-y-4"
         >
-          <h3 class="text-xs font-semibold text-gray-400 tracking-wider uppercase">
+          <h3 class="text-xs font-semibold text-black tracking-wider uppercase">
             {{ section.title }}
           </h3>
 
@@ -83,7 +77,7 @@ const footerSections = [
             <li v-for="link in section.links" :key="link.name">
               <a
                 :href="link.href"
-                class="text-sm text-gray-600 hover:text-blue-900 transition-colors duration-150"
+                class="text-sm text-black hover:text-red-900 transition-colors duration-150"
               >
                 {{ link.name }}
               </a>
@@ -95,14 +89,14 @@ const footerSections = [
 
       <!-- BOTTOM BAR -->
       <div
-        class="mt-12 pt-8 border-t border-gray-100 flex flex-col sm:flex-row justify-between items-center gap-4"
+        class="mt-12 pt-8 border-t border-red-900/10 flex flex-col sm:flex-row justify-between items-center gap-4"
       >
-        <p class="text-xs text-gray-400">
+        <p class="text-xs text-black">
           &copy; {{ currentYear }} Emotional Journal. Tutti i diritti riservati.
         </p>
 
-        <p class="text-xs text-gray-400 tracking-wide">
-          P.IVA 01234567890
+        <p class="text-xs text-black tracking-wide">
+          @manuelrovitti
         </p>
       </div>
 

@@ -16,7 +16,7 @@ const navLinks = [
 
 <template>
   <!-- NAVBAR FULL WIDTH -->
-  <nav class="sticky top-0 z-50 w-screen bg-blue-200 backdrop-blur-xl border-b border-gray-200/60">
+  <nav class="sticky top-0 z-50 w-screen bg-blue-200 backdrop-blur-xl border-b border-red-900/10">
 
     <!-- FULL WIDTH CONTENT (NO LIMITI) -->
     <div class="w-full px-6 lg:px-10">

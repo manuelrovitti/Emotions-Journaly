@@ -44,7 +44,7 @@
         <textarea
           v-model="form.text"
           rows="6"
-          placeholder="Scrivi qui i tuoi pensieri..."
+          placeholder="Write your thoughts here..."
           class="w-full resize-none rounded-lg border border-slate-300 px-4 py-3 focus:border-indigo-500 focus:outline-none"
         ></textarea>
       </div>
