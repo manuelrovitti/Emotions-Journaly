@@ -10,4 +10,5 @@ su AC:
 
 su AC_B:
 - python -m pip install fastapi pydantic transformers torch pandas uvicorn[standard]
+python -m pip install requests
 - uvicorn server:app --host 0.0.0.0 --port 8000

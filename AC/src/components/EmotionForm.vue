@@ -6,89 +6,72 @@
 
     <form @submit.prevent="submitForm" class="space-y-4">
 
-      <!-- NAME + SURNAME -->
       <div class="grid gap-4 md:grid-cols-2">
-        <div>
-          <label class="mb-2 block text-sm font-medium">
-            Name
-          </label>
+        <input v-model="form.name" placeholder="Name"
+          class="w-full rounded-lg border px-4 py-3" />
 
-          <input
-            v-model="form.name"
-            type="text"
-            placeholder="Mario"
-            class="w-full rounded-lg border border-slate-300 px-4 py-3 focus:border-indigo-500 focus:outline-none"
-          />
-        </div>
-
-        <div>
-          <label class="mb-2 block text-sm font-medium">
-            Surname
-          </label>
-
-          <input
-            v-model="form.surname"
-            type="text"
-            placeholder="Rossi"
-            class="w-full rounded-lg border border-slate-300 px-4 py-3 focus:border-indigo-500 focus:outline-none"
-          />
-        </div>
+        <input v-model="form.surname" placeholder="Surname"
+          class="w-full rounded-lg border px-4 py-3" />
       </div>
 
-      <!-- TEXT AREA -->
-      <div>
-        <label class="mb-2 block text-sm font-medium">
-          How are you feeling today?
-        </label>
+      <textarea v-model="form.text"
+        rows="6"
+        placeholder="Write your thoughts..."
+        class="w-full rounded-lg border px-4 py-3">
+      </textarea>
 
-        <textarea
-          v-model="form.text"
-          rows="6"
-          placeholder="Write your thoughts here..."
-          class="w-full resize-none rounded-lg border border-slate-300 px-4 py-3 focus:border-indigo-500 focus:outline-none"
-        ></textarea>
-      </div>
-
-      <!-- BUTTON -->
       <button
         type="submit"
         :disabled="!isValid"
-        class="rounded-lg px-6 py-3 font-semibold text-white transition"
-        :class="isValid
-          ? 'bg-indigo-600 hover:bg-indigo-700'
-          : 'bg-gray-400 cursor-not-allowed'"
+        class="px-6 py-3 rounded-lg text-white"
+        :class="isValid ? 'bg-indigo-600' : 'bg-gray-400'"
       >
         Analyze Emotion
       </button>
     </form>
 
-    <!-- RESULT -->
+    <!-- PIPELINE -->
     <div
-      v-if="emotion"
+      v-if="hasPipeline"
       class="mt-6 rounded-xl bg-slate-50 p-4"
     >
-      <p class="text-sm text-slate-500">
-        Emotion detected
+      <p class="text-sm text-slate-500">Emotion Pipeline</p>
+
+      <p class="text-xl font-bold">
+        {{ emotion_pipeline || "N/A" }}
       </p>
 
-      <p class="mt-2 text-xl font-bold">
-        {{ emotion }}
-      </p>
-
-      <p class="text-lg font-semibold text-indigo-600">
-        Confidence: {{ confidence }}%
+      <p class="text-indigo-600 font-semibold">
+        Confidence: {{ confidence_pipeline }}%
       </p>
     </div>
+
+    <!-- API -->
+    <div
+      v-if="hasApi"
+      class="mt-6 rounded-xl bg-slate-50 p-4"
+    >
+      <p class="text-sm text-slate-500">Emotion API</p>
+
+      <p class="text-xl font-bold">
+        {{ emotion_api || "N/A" }}
+      </p>
+
+      <p class="text-indigo-600 font-semibold">
+        Confidence: {{ confidence_api }}%
+      </p>
+
+      <!-- DEBUG ERROR (IMPORTANTISSIMO) -->
+      <p v-if="api_error" class="text-red-500 text-sm mt-2">
+        {{ api_error }}
+      </p>
+    </div>
+
   </div>
 </template>
 
 <script setup>
 import { ref, computed } from "vue";
-
-const emit = defineEmits(["analyze"]);
-
-const emotion = ref("");
-const confidence = ref(null);
 
 const form = ref({
   name: "",
@@ -96,47 +79,51 @@ const form = ref({
   text: "",
 });
 
-/* ✅ VALIDAZIONE FORM */
-const isValid = computed(() => {
-  return (
-    form.value.name.trim() !== "" &&
-    form.value.surname.trim() !== "" &&
-    form.value.text.trim() !== ""
-  );
-});
+/* RESULTS */
+const emotion_pipeline = ref("");
+const confidence_pipeline = ref(0);
 
+const emotion_api = ref("");
+const confidence_api = ref(0);
+
+const api_error = ref(null);
+
+/* VALIDATION */
+const isValid = computed(() =>
+  form.value.name && form.value.surname && form.value.text
+);
+
+/* VISIBILITY (IMPORTANT FIX) */
+const hasPipeline = computed(() => !!emotion_pipeline.value);
+const hasApi = computed(() => emotion_api.value !== null && emotion_api.value !== "");
+
+/* SUBMIT */
 async function submitForm() {
-  if (!isValid.value) return;
-
-
   try {
-    const response = await fetch("http://localhost:8000/analyze", {
+    const res = await fetch("http://localhost:8000/analyze", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(form.value),
     });
 
-    const data = await response.json();
+    const data = await res.json();
 
-    emotion.value = data.emotion;
-    confidence.value = data.confidence;
+    console.log("API RESPONSE:", data); // DEBUG
 
-  emit("analyze", {
-    name: form.value.name,
-    surname: form.value.surname,
-    text: form.value.text,
-    emotion: data.emotion,
-    confidence: data.confidence,
+    /* PIPELINE */
+    emotion_pipeline.value = data.emotion_pipeline;
+    confidence_pipeline.value = (data.confidence_pipeline * 100).toFixed(2);
 
-    });
+    /* API */
+    emotion_api.value = data.emotion_api;
+    confidence_api.value = (data.confidence_api * 100).toFixed(2);
+
+    /* ERROR HANDLING */
+    api_error.value = data.error || null;
 
   } catch (err) {
-    emotion.value = "Errore API";
     console.error(err);
+    api_error.value = "Backend error";
   }
-
-  loading.value = false;
 }
 </script>

@@ -8,7 +8,7 @@ DATA_DIR.mkdir(exist_ok=True)
 FILE_NAME = DATA_DIR / "dataset.csv"
 
 
-def save_analysis(name, surname, text, emotion, confidence, gt=""):
+def save_analysis(name, surname, text, emotion_pipeline, confidence_pipeline, emotion_api, confidence_api, agreement, gt=""):
 
     file_exists = FILE_NAME.exists()
 
@@ -21,8 +21,11 @@ def save_analysis(name, surname, text, emotion, confidence, gt=""):
                 "Name",
                 "Surname",
                 "Text",
-                "Emotion",
-                "Confidence",
+                "Emotion_Pipeline",
+                "Confidence_Pipeline",
+                "Emotion_API",
+                "Confidence_API",
+                "agreement",
                 "G_T"
             ])
 
@@ -30,8 +33,11 @@ def save_analysis(name, surname, text, emotion, confidence, gt=""):
             name,
             surname,
             text,
-            emotion,
-            confidence,
+            emotion_pipeline,
+            confidence_pipeline,
+            emotion_api,
+            confidence_api,
+            agreement,
             gt
         ])
 

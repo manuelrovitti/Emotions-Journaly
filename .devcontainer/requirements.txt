@@ -4,3 +4,4 @@ uvicorn[standard]
 transformers
 torch
 pandas
+requests
