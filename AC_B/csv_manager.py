@@ -50,7 +50,7 @@ def read_analysis(name=None, surname=None):
         results = []
 
         for row in reader:
-            if (name is None or row["Name"] == name) and (surname is None or row["Surname"] == surname):
-                results.append(row["Emotion"])
+            if (name is None or row["Name"] == name) and (surname is None or row["Surname"] == surname) and (row["agreement"] == "True"):
+                results.append(row["Emotion_API"])
 
         return results

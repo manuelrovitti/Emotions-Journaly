@@ -33,11 +33,11 @@
         <!-- HAPPINESS -->
         <div class="rounded-xl bg-yellow-50 p-4">
           <p class="text-sm text-slate-600">
-            Neutralità 
+            Altre 
           </p>
 
           <p class="mt-2 text-3xl font-bold">
-            {{ stats.neutral }}%
+            {{ stats.other }}%
           </p>
         </div>
 
@@ -95,7 +95,7 @@ const total = computed(() => history.value.length);
 const stats = computed(() => {
   const counts = {
     joy: 0,
-    neutral: 0,
+    other: 0,
     sadness: 0,
   };
 
@@ -109,7 +109,7 @@ const stats = computed(() => {
 
   return {
     happy: Math.round((counts.joy / total) * 100),
-    neutral: Math.round((counts.neutral / total) * 100),
+    other: Math.round((((total - counts.joy) - counts.sadness) / total) * 100),
     sad: Math.round((counts.sadness / total) * 100),
   };
 });
