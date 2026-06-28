@@ -14,6 +14,11 @@ const routes = createRouter({
             component: () => import('../pages/About.vue')
         },
         {
+            path: '/journaly',
+            name: 'Journaly',
+            component: () => import('../pages/Journaly.vue') 
+        },
+        {
             path: '/:pathMatch(.*)*',
             redirect: '/'
         }

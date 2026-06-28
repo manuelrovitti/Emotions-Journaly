@@ -9,7 +9,7 @@ const toggleMenu = () => {
 
 const navLinks = [
   { name: 'Home', href: '/' },
-  { name: 'Diary', href: '/diary' },
+  { name: 'Journaly', href: '/journaly' },
   { name: 'About', href: '/about' },
 ]
 </script>

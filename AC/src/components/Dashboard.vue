@@ -74,7 +74,7 @@ const props = defineProps({
 async function loadHistory() {
   console.log("▶ loadHistory chiamata");
 
-  const url = `http://localhost:8000/history/${props.name}/${props.surname}`;
+  const url = `http://localhost:8000/dashboard/${props.name}/${props.surname}`;
   console.log("URL:", url);
 
   const res = await fetch(url);

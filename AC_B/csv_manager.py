@@ -54,3 +54,19 @@ def read_analysis(name=None, surname=None):
                 results.append(row["Emotion_API"])
 
         return results
+    
+    
+def read_history(name=None, surname=None):
+
+    if not FILE_NAME.exists():
+        return []
+    
+    with open(FILE_NAME, "r", newline="", encoding="utf-8") as file:
+        reader = csv.DictReader(file)
+        history = []
+
+        for row in reader:
+            if (name is None or row["Name"] == name) and (surname is None or row["Surname"] == surname):
+                history.append(row)
+    
+        return history

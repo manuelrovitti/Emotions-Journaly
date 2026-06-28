@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 from transformers import pipeline
 from fastapi.middleware.cors import CORSMiddleware
-from csv_manager import save_analysis, read_analysis
+from csv_manager import save_analysis, read_analysis, read_history
 
 import os
 import requests
@@ -178,6 +178,10 @@ def analyze(data: InputText):
 # =========================
 # HISTORY
 # =========================
-@app.get("/history/{name}/{surname}")
-def get_history(name: str, surname: str):
+@app.get("/dashboard/{name}/{surname}")
+def get_dashboaard(name: str, surname: str):
     return read_analysis(name=name, surname=surname)
+
+@app.get("/history/{name}/{surname}")
+def get_history(name:str, surname:str):
+    return read_history(name=name, surname=surname)
