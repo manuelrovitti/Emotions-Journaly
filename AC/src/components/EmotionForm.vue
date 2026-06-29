@@ -73,16 +73,28 @@
       </p>
     </div>
 
-    <!-- API -->
-    <div v-if="hasApi" class="mt-6 rounded-xl bg-slate-50 p-4">
-      <p class="text-sm text-slate-500">Emotion API</p>
+    <!-- ROBERTTA -->
+    <div v-if="hasRoberta" class="mt-6 rounded-xl bg-slate-50 p-4">
+      <p class="text-sm text-slate-500">Emotion Roberta</p>
 
       <p class="text-xl font-bold">
-        {{ emotion_api || "N/A" }}
+        {{ emotion_roberta || "N/A" }}
       </p>
 
       <p class="font-semibold text-indigo-600">
-        Confidence: {{ confidence_api }}%
+        Confidence: {{ confidence_roberta }}%
+      </p>
+
+      <p v-if="api_error" class="mt-2 text-sm text-red-500">
+        {{ api_error }}
+      </p>
+    </div>
+
+    <div v-if="hasQwen" class="mt-6 rounded-xl bg-slate-50 p-4">
+      <p class="text-sm text-slate-500">Emotion Qwen</p>
+
+      <p class="text-xl font-bold">
+        {{ emotion_qwen || "N/A" }}
       </p>
 
       <p v-if="api_error" class="mt-2 text-sm text-red-500">
@@ -109,10 +121,11 @@ const form = ref({
 const emotion_pipeline = ref("");
 const confidence_pipeline = ref(0);
 
-const emotion_api = ref("");
-const confidence_api = ref(0);
+const emotion_roberta = ref("");
+const confidence_roberta = ref(0);
 
-const api_error = ref(null);
+const emotion_qwen = ref("");
+const confidence_qwen = ref(0);
 
 /* LOADING */
 const loading = ref(false);
@@ -126,8 +139,11 @@ const isValid = computed(() =>
 
 /* VISIBILITY */
 const hasPipeline = computed(() => !!emotion_pipeline.value);
-const hasApi = computed(
-  () => emotion_api.value !== null && emotion_api.value !== ""
+const hasRoberta = computed(
+  () => emotion_roberta.value !== null && emotion_roberta.value !== ""
+);
+const hasQwen = computed ( 
+  () => emotion_qwen.value != null && emotion_qwen.value != ""
 );
 
 /* SUBMIT */
@@ -152,12 +168,14 @@ async function submitForm() {
       data.confidence_pipeline * 100
     ).toFixed(2);
 
-    emotion_api.value = data.emotion_api;
-    confidence_api.value = (
-      data.confidence_api * 100
+    emotion_roberta.value = data.emotion_roberta;
+    confidence_roberta.value = (
+      data.confidence_roberta * 100
     ).toFixed(2);
 
-    api_error.value = data.error || null;
+    emotion_qwen.value = data.emotion_qwen;
+
+
 
     /* ✅ EMIT AL PARENT */
     emit("analyze", {

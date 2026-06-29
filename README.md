@@ -12,3 +12,16 @@ su AC_B:
 - python -m pip install fastapi pydantic transformers torch pandas uvicorn[standard]
 python -m pip install requests
 - uvicorn server:app --host 0.0.0.0 --port 8000
+
+# Models
+- pipeline : "arpanghoshal/EkmanClassifier":
+    ## Learning
+
+- HuggingFace: "emotion-english-distilroberta-base"
+    ## Learning
+    Addestrato su testo in inglese, tali testi sono stati presi da X (Twittter), Reddit, auto-rapporti degli studenti e dialoghi televisivi.
+    ### Struttura Output
+    Array con etichetta + puntteggio, il punteggio indica la probabilita' di corrrispondenza.
+
+- HuggingFace: 
+    ## Learning

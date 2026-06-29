@@ -6,12 +6,12 @@ from csv_manager import save_analysis, read_analysis, read_history
 
 import os
 import requests
+from collections import Counter
 
 app = FastAPI()
 
 # =========================
 # CORS
-# =========================
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -22,7 +22,6 @@ app.add_middleware(
 
 # =========================
 # MODELLO LOCALE
-# =========================
 ekman_pipeline = pipeline(
     "sentiment-analysis",
     model="arpanghoshal/EkmanClassifier"
@@ -30,24 +29,23 @@ ekman_pipeline = pipeline(
 
 # =========================
 # HF CONFIG
-# =========================
 HF_TOKEN = os.environ.get("HF_TOKEN")
+EMOTIONS = ["joy", "sadness", "anger", "fear", "surprise", "disgust", "neutral"]
 
-API_URL = "https://router.huggingface.co/hf-inference/models/j-hartmann/emotion-english-distilroberta-base"
-
-headers = {
+ROBERTA_URL = "https://router.huggingface.co/hf-inference/models/j-hartmann/emotion-english-distilroberta-base"
+LLM_URL = "https://router.huggingface.co/v1/chat/completions"
+HEADERS = {
     "Authorization": f"Bearer {HF_TOKEN}"
 }
 
 
 # =========================
-# SAFE API CALL (ROBUST)
-# =========================
-def ekman_api_emotion(text: str):
+# ROBERTA
+def roberta_api_emotion(text: str):
     try:
         response = requests.post(
-            API_URL,
-            headers=headers,
+            ROBERTA_URL,
+            headers=HEADERS,
             json={"inputs": text},
             timeout=8
         )
@@ -61,7 +59,6 @@ def ekman_api_emotion(text: str):
             return {
                 "emotion": None,
                 "confidence": 0.0,
-                "error": result.get("error", "HF error")
             }
 
         # ❌ empty response
@@ -69,7 +66,6 @@ def ekman_api_emotion(text: str):
             return {
                 "emotion": None,
                 "confidence": 0.0,
-                "error": "Empty response"
             }
 
         emotions = result[0]
@@ -84,7 +80,6 @@ def ekman_api_emotion(text: str):
             return {
                 "emotion": None,
                 "confidence": 0.0,
-                "error": "Invalid emotion format"
             }
 
         top = max(valid, key=lambda x: x["score"])
@@ -98,28 +93,79 @@ def ekman_api_emotion(text: str):
         return {
             "emotion": None,
             "confidence": 0.0,
-            "error": f"API failed: {str(e)}"
         }
+
+#==========================
+# API QWEN  
+def qwen_api_emotion(text:str):
+    try:
+        responce = requests.post(
+            LLM_URL,
+            headers = HEADERS,
+            json= {
+                "model" : "Qwen/Qwen2.5-7B-Instruct",
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": f"""Return only one emotion: joy, sadness, anger, fearr, surprise, disgust, neutral. Text: {text}"""
+ 
+                    }
+                ],
+                "temperature":0.0
+            },
+            timeout=10
+        )
+        emotion = responce.json()["choices"][0]["message"]["content"]
+
+        return {
+            "emotion": clean_emotion(emotion),
+            "confidence": 0.0,
+        }
+
+    except Exception as e:
+        return {
+            "emotion": None,
+            "confidence": 0.0,
+        }
+
+#==========================
+# CLEAN OUTPUT QWEN
+def clean_emotion(text: str):
+    text = text.lower()
+    for e in EMOTIONS:
+        if e in text:
+            return e
+    return "All"
+
+#==========================
+# AGREEMENT
+def aggrement (emo1:str, emo2:str, emo3:str):
+    emotions = [emo1, emo2, emo3]
+    count = Counter(emotions)
+    most_common, freq = count.most_common(1)[0]
+
+    if freq == 3:
+        return "full"
+    elif freq == 2:
+        return "partial"
+    else:
+        return "none"
 
 
 # =========================
 # INPUT
-# =========================
 class InputText(BaseModel):
     name: str
     surname: str
     text: str
 
-
 # =========================
 # ANALYZE + SAVE
-# =========================
 @app.post("/analyze")
 def analyze(data: InputText):
 
     # =====================
-    # LOCAL MODEL (SAFE)
-    # =====================
+    # LOCAL MODEL 
     try:
         result_pipeline = ekman_pipeline(data.text)[0]
         emotion_pipeline = result_pipeline["label"]
@@ -127,26 +173,24 @@ def analyze(data: InputText):
     except Exception as e:
         emotion_pipeline = "error"
         confidence_pipeline = 0.0
-        print("Pipeline error:", e)
 
     # =====================
-    # API MODEL (SAFE)
-    # =====================
-    result_api = ekman_api_emotion(data.text)
+    # API RROBERTA
+    result_roberta = roberta_api_emotion(data.text)
+    emotion_roberta = result_roberta["emotion"] or "unavailable"
+    confidence_roberta = float(result_roberta["confidence"])
+    print("\n ROBERTA RESULT:", result_roberta)
 
-    emotion_api = result_api["emotion"] or "unavailable"
-    confidence_api = float(result_api["confidence"])
+    #======================
+    # API QWEN
+    result_qwen = qwen_api_emotion(data.text)
+    emotion_qwen = result_qwen["emotion"]
+    print("\n QWEN RESULT:", result_qwen)
 
-    print("API RESULT:", result_api)
 
     # =====================
     # AGREEMENT
-    # =====================
-    agreement = (
-        emotion_api == emotion_pipeline
-        if emotion_api != "unavailable"
-        else False
-    )
+    agreement = aggrement(emotion_pipeline, emotion_roberta, emotion_qwen)
 
     # =====================
     # SAVE CSV
@@ -157,8 +201,9 @@ def analyze(data: InputText):
         data.text,
         emotion_pipeline,
         confidence_pipeline,
-        emotion_api,
-        confidence_api,
+        emotion_roberta,
+        confidence_roberta,
+        emotion_qwen,
         agreement
     )
 
@@ -168,10 +213,10 @@ def analyze(data: InputText):
     return {
         "emotion_pipeline": emotion_pipeline,
         "confidence_pipeline": confidence_pipeline,
-        "emotion_api": emotion_api,
-        "confidence_api": confidence_api,
+        "emotion_roberta": emotion_roberta,
+        "confidence_roberta": confidence_roberta,
+        "emotion_qwen": emotion_qwen,
         "agreement": agreement,
-        "api_status": "ok" if result_api["emotion"] else "fallback"
     }
 
 
