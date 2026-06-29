@@ -1,2 +1,6 @@
 Name,Surname,Text,Emotion_Pipeline,Confidence_Pipeline,Emotion_Roberta,Confidence_Roberta,Emotion_Qwen,agreement,G_T
 sa,ra,sad,sadness,0.9858205318450928,sadness,0.919236421585083,sadness,full,
+SA,RA,HAPPY?,neutral,0.9170494675636292,joy,0.5785239934921265,joy,partial,
+sa,ra,sad,sadness,0.9858205318450928,unavailable,0.0,sadness,partial,
+sa,ra,sad300,sadness,0.9626282453536987,sadness,0.6507457494735718,sadness,full,
+sa,ra,i love u 3000,joy,0.9996811151504517,"['joy', 'sadness', 'surprise']","[0.8481637835502625, 0.11216674000024796, 0.02333654649555683]",joy,full,

@@ -27,17 +27,24 @@ ekman_pipeline = pipeline(
     model="arpanghoshal/EkmanClassifier"
 )
 
+#==========================
+# PIPELINE
+def pipeline_emotion(text:str):
+
+    try:
+        result_pipeline = ekman_pipeline(text)[0]
+        return result_pipeline
+    except Exception as e:
+        result = {"label" : "None", "score": 0.0}
+        return result
+
 # =========================
 # HF CONFIG
 HF_TOKEN = os.environ.get("HF_TOKEN")
 EMOTIONS = ["joy", "sadness", "anger", "fear", "surprise", "disgust", "neutral"]
-
 ROBERTA_URL = "https://router.huggingface.co/hf-inference/models/j-hartmann/emotion-english-distilroberta-base"
 LLM_URL = "https://router.huggingface.co/v1/chat/completions"
-HEADERS = {
-    "Authorization": f"Bearer {HF_TOKEN}"
-}
-
+HEADERS = {"Authorization": f"Bearer {HF_TOKEN}"}
 
 # =========================
 # ROBERTA
@@ -54,14 +61,14 @@ def roberta_api_emotion(text: str):
 
         print("HF RAW RESPONSE:", result)
 
-        # ❌ HF error / loading
+        # HF error / loading
         if isinstance(result, dict):
             return {
                 "emotion": None,
                 "confidence": 0.0,
             }
 
-        # ❌ empty response
+        # empty response
         if not isinstance(result, list) or len(result) == 0:
             return {
                 "emotion": None,
@@ -70,7 +77,7 @@ def roberta_api_emotion(text: str):
 
         emotions = result[0]
 
-        # 🔥 safe max (ignore broken entries)
+        # safe max (ignore broken entries)
         valid = [
             e for e in emotions
             if isinstance(e, dict) and "label" in e and "score" in e
@@ -82,12 +89,14 @@ def roberta_api_emotion(text: str):
                 "confidence": 0.0,
             }
 
-        top = max(valid, key=lambda x: x["score"])
-
-        return {
-            "emotion": top["label"],
-            "confidence": float(top["score"])
-        }
+        #top = max(valid, key=lambda x: x["score"])
+        top=valid[:3]
+        #return {
+        #    "emotion": top["label"][0],
+        #    "confidence": float(top["score"][0])
+        #}
+        print("top:", top)
+        return top
 
     except Exception as e:
         return {
@@ -108,7 +117,6 @@ def qwen_api_emotion(text:str):
                     {
                         "role": "user",
                         "content": f"""Return only one emotion: joy, sadness, anger, fearr, surprise, disgust, neutral. Text: {text}"""
- 
                     }
                 ],
                 "temperature":0.0
@@ -142,7 +150,7 @@ def clean_emotion(text: str):
 def aggrement (emo1:str, emo2:str, emo3:str):
     emotions = [emo1, emo2, emo3]
     count = Counter(emotions)
-    most_common, freq = count.most_common(1)[0]
+    _, freq = count.most_common(1)[0]
 
     if freq == 3:
         return "full"
@@ -164,21 +172,24 @@ class InputText(BaseModel):
 @app.post("/analyze")
 def analyze(data: InputText):
 
-    # =====================
-    # LOCAL MODEL 
-    try:
-        result_pipeline = ekman_pipeline(data.text)[0]
-        emotion_pipeline = result_pipeline["label"]
-        confidence_pipeline = float(result_pipeline["score"])
-    except Exception as e:
-        emotion_pipeline = "error"
-        confidence_pipeline = 0.0
-
+    #======================
+    # LOCAL PIPELINE
+    result_pipeline = pipeline_emotion(data.text)
+    emotion_pipeline = result_pipeline["label"]
+    confidence_pipeline = float(result_pipeline["score"])
+    print("\n PIPELINE RESULT:", result_pipeline)
+    
     # =====================
     # API RROBERTA
     result_roberta = roberta_api_emotion(data.text)
-    emotion_roberta = result_roberta["emotion"] or "unavailable"
-    confidence_roberta = float(result_roberta["confidence"])
+    emotions_roberta = [e["label"] for e in result_roberta]
+    emotion_roberta1 = result_roberta[0]["label"] or "unavailable"
+    emotion_roberta2 = result_roberta[1]["label"] or "unavailable"
+    emotion_roberta3 = result_roberta[2]["label"] or "unavailable"
+    confidences_roberta = [e["score"] for e in result_roberta]
+    confidence_roberta1 = float(result_roberta[0]["score"])
+    confidence_roberta2 = float(result_roberta[1]["score"])
+    confidence_roberta3 = float(result_roberta[2]["score"])
     print("\n ROBERTA RESULT:", result_roberta)
 
     #======================
@@ -187,46 +198,44 @@ def analyze(data: InputText):
     emotion_qwen = result_qwen["emotion"]
     print("\n QWEN RESULT:", result_qwen)
 
-
     # =====================
     # AGREEMENT
-    agreement = aggrement(emotion_pipeline, emotion_roberta, emotion_qwen)
+    agreement = aggrement(emotion_pipeline, emotion_roberta1, emotion_qwen)
 
     # =====================
     # SAVE CSV
-    # =====================
     save_analysis(
         data.name,
         data.surname,
         data.text,
         emotion_pipeline,
         confidence_pipeline,
-        emotion_roberta,
-        confidence_roberta,
+        emotions_roberta,
+        confidences_roberta,
         emotion_qwen,
         agreement
     )
 
     # =====================
     # RESPONSE
-    # =====================
     return {
         "emotion_pipeline": emotion_pipeline,
         "confidence_pipeline": confidence_pipeline,
-        "emotion_roberta": emotion_roberta,
-        "confidence_roberta": confidence_roberta,
+        "emotion_roberta": emotion_roberta1,
+        "confidence_roberta": confidence_roberta1,
         "emotion_qwen": emotion_qwen,
         "agreement": agreement,
     }
 
 
 # =========================
-# HISTORY
-# =========================
+# HISTORY DASHBOARD
 @app.get("/dashboard/{name}/{surname}")
 def get_dashboaard(name: str, surname: str):
     return read_analysis(name=name, surname=surname)
 
+#==========================
+# HISTORY TOTAL
 @app.get("/history/{name}/{surname}")
 def get_history(name:str, surname:str):
     return read_history(name=name, surname=surname)
