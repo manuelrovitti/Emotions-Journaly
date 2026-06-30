@@ -184,12 +184,12 @@ def analyze(data: InputText):
     result_roberta = roberta_api_emotion(data.text)
     emotions_roberta = [e["label"] for e in result_roberta]
     emotion_roberta1 = result_roberta[0]["label"] or "unavailable"
-    emotion_roberta2 = result_roberta[1]["label"] or "unavailable"
-    emotion_roberta3 = result_roberta[2]["label"] or "unavailable"
+    #emotion_roberta2 = result_roberta[1]["label"] or "unavailable"
+    #emotion_roberta3 = result_roberta[2]["label"] or "unavailable"
     confidences_roberta = [e["score"] for e in result_roberta]
     confidence_roberta1 = float(result_roberta[0]["score"])
-    confidence_roberta2 = float(result_roberta[1]["score"])
-    confidence_roberta3 = float(result_roberta[2]["score"])
+    #confidence_roberta2 = float(result_roberta[1]["score"])
+    #confidence_roberta3 = float(result_roberta[2]["score"])
     print("\n ROBERTA RESULT:", result_roberta)
 
     #======================
