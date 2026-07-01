@@ -145,9 +145,9 @@ async function saveGT() {
 
         <div class="grid gap-4 md:grid-cols-2">
 
-          <input v-model="form.name" type="text" placeholder="Name" class="rounded-lg border px-4 py-3" />
+          <input v-model.trim="form.name" type="text" placeholder="Name" class="rounded-lg border px-4 py-3" />
 
-          <input v-model="form.surname" type="text" placeholder="Surname" class="rounded-lg border px-4 py-3" />
+          <input v-model.trim="form.surname" type="text" placeholder="Surname" class="rounded-lg border px-4 py-3" />
 
         </div>
 

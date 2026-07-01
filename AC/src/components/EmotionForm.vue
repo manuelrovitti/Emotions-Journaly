@@ -27,20 +27,20 @@
 
       <div class="grid gap-4 md:grid-cols-2">
         <input
-          v-model="form.name"
+          v-model.trim="form.name"
           placeholder="Name"
           class="w-full rounded-lg border px-4 py-3"
         />
 
         <input
-          v-model="form.surname"
+          v-model.trim="form.surname"
           placeholder="Surname"
           class="w-full rounded-lg border px-4 py-3"
         />
       </div>
 
       <textarea
-        v-model="form.text"
+        v-model.trim="form.text"
         rows="6"
         placeholder="Write your thoughts..."
         class="w-full rounded-lg border px-4 py-3"
