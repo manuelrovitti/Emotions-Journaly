@@ -1,12 +1,6 @@
-Name,Surname,Text,Emotion_Pipeline,Confidence_Pipeline,Emotion_Roberta,Confidence_Roberta,Emotion_Qwen,agreement,G_T
-ma,nu,today i have a exam,neutral,0.9193745851516724,"['sadness', 'surprise', 'joy']","[0.33712953329086304, 0.30295783281326294, 0.22553494572639465]",neutral,partial, neutral
-ma,nu,i love you Lola,joy,0.9996703863143921,"['joy', 'sadness', 'surprise']","[0.964901328086853, 0.021603375673294067, 0.008267385885119438]",joy,full, joy
-ma,nu,im happy,joy,0.999421238899231,"['joy', 'surprise', 'sadness']","[0.9676284193992615, 0.019154246896505356, 0.008550557307898998]",joy,full,
-ma,nu,sad,sadness,0.9858205318450928,"['sadness', 'surprise', 'neutral']","[0.919236421585083, 0.04836713895201683, 0.018496882170438766]",sadness,full,
-ma,nu,im sad,sadness,0.989905059337616,"['sadness', 'surprise', 'joy']","[0.986750066280365, 0.006776663940399885, 0.002428281120955944]",sadness,full,
-ma,nu,blind,neutral,0.9741491675376892,"['neutral', 'sadness', 'surprise']","[0.40138548612594604, 0.2599737048149109, 0.14449332654476166]",neutral,full,
-ma,nu,sad,sadness,0.9858205318450928,"['sadness', 'surprise', 'neutral']","[0.919236421585083, 0.04836713895201683, 0.018496882170438766]",sadness,full,
-ma,nu,sad,sadness,0.9858205318450928,"['sadness', 'surprise', 'neutral']","[0.919236421585083, 0.04836713895201683, 0.018496882170438766]",sadness,full,
-ma,nu,ciao,neutral,0.9905407428741455,"['neutral', 'surprise', 'sadness']","[0.824094295501709, 0.07455617934465408, 0.043954066932201385]",neutral,full,
-ma,nu,im focus ,neutral,0.6951472163200378,"['fear', 'anger', 'joy']","[0.5874564051628113, 0.2530059814453125, 0.07571105659008026]",neutral,partial,
-ma,nu,im anger with  my mom,anger,0.9177735447883606,"['anger', 'sadness', 'joy']","[0.9756156802177429, 0.015759993344545364, 0.0033233403228223324]",anger,full,
+id                                  , Name, Surname, Text                   , Emotion_Pipeline, Confidence_Pipeline, Emotion_Roberta                     , Confidence_Roberta                                              , Emotion_Qwen, agreement, G_T
+664f8c83-41b8-4916-b1cc-5d41be913057, ma  , nu     , sad                    , sadness         ,  0.9858205318450928, "['sadness', 'surprise', 'neutral']", "[0.919236421585083, 0.04836713895201683, 0.018496882170438766]", sadness     , full     , "[""SADNESS""]"
+89aff752-d62c-4607-9516-30ed4518564c, ma  , nu     , i kill                 , neutral         ,  0.3999377191066742, "['fear', 'anger', 'sadness']"      , "[0.5333072543144226, 0.36743995547294617, 0.04880526289343834]", anger       , none     , "[""ANGER"", ""SADNESS""]"
+4374898f-552e-4176-b154-cab34c4caab3, ma  , nu     , i hit myself           , neutral         ,  0.6073895692825317, "['sadness', 'fear', 'surprise']"   , "[0.6039990186691284, 0.19842347502708435, 0.13820971548557281]", anger       , none     , "[""ANGER"", ""SADNESS"", ""FEAR""]"
+8a68a1c4-ddaf-4680-8740-c60804a08cf3, ma  , nu     , sad                    , sadness         ,  0.9858205318450928, "['sadness', 'surprise', 'neutral']", "[0.919236421585083, 0.04836713895201683, 0.018496882170438766]", sadness     , full     , 
+b1af92a4-13a3-4ed0-8287-7ecac2ae3063, ma  , nu     , dio cane sono arrabiato, neutral         ,  0.9869094491004944, "['neutral', 'surprise', 'sadness']", "[0.7360641956329346, 0.116031214594841, 0.05727672949433327]"  , anger       , partial  , 

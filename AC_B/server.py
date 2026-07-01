@@ -2,13 +2,15 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 from transformers import pipeline
 from fastapi.middleware.cors import CORSMiddleware
-from csv_manager import save_analysis, read_analysis, read_history
+from csv_manager import DATA_DIR, save_analysis, read_analysis, read_history, overwrite_history
 
 import os
 import requests
+import json, csv
 from collections import Counter
 
 app = FastAPI()
+FILE_NAME = DATA_DIR / "dataset.csv"
 
 # =========================
 # CORS
@@ -167,6 +169,14 @@ class InputText(BaseModel):
     surname: str
     text: str
 
+#=========================
+# G_T
+class GTRequest(BaseModel):
+    name: str
+    surname: str
+    id: str
+    gt: list[str]
+
 # =========================
 # ANALYZE + SAVE
 @app.post("/analyze")
@@ -239,3 +249,29 @@ def get_dashboaard(name: str, surname: str):
 @app.get("/history/{name}/{surname}")
 def get_history(name:str, surname:str):
     return read_history(name=name, surname=surname)
+
+#==========================
+# SAVE G_T
+@app.post("/save-gt")
+def save_gt(data: GTRequest):
+
+    # 1. leggi CSV vero (NON read_history)
+    with open(FILE_NAME, "r", newline="", encoding="utf-8") as file:
+        rows = list(csv.DictReader(file))
+
+    found = False
+
+    # 2. aggiorna SOLO la riga giusta
+    for row in rows:
+        if row["id"] == data.id:
+            row["G_T"] = json.dumps(data.gt, ensure_ascii=False)
+            found = True
+            break
+
+    if not found:
+        return {"status": "error", "message": "ID non trovato"}
+
+    # 3. riscrivi SOLO UNA VOLTA
+    overwrite_history(rows)
+
+    return {"status": "ok"}

@@ -68,21 +68,21 @@ function nextItem() {
 const selectedGT = ref([]);
 
 const emotions = [
-  "JOY 😂",
-  "SADNESS 😞",
-  "ANGER 😡",
-  "FEAR 😱",
-  "SURPRISE 😯",
-  "NEUTRAL 😐"
+  "JOY",
+  "SADNESS",
+  "ANGER",
+  "FEAR",
+  "SURPRISE",
+  "NEUTRAL"
 ];
 
 const emotionsColors = {
-  "JOY 😂": "bg-yellow-100 text-yellow-800",
-  "SADNESS 😞": "bg-blue-100 text-blue-800",
-  "ANGER 😡": "bg-red-100 text-red-800",
-  "FEAR 😱": "bg-purple-100 text-purple-800",
-  "SURPRISE 😯": "bg-orange-100 text-orange-800",
-  "NEUTRAL 😐": "bg-gray-100 text-gray-800"
+  "JOY": "bg-yellow-100 text-yellow-800",
+  "SADNESS": "bg-blue-100 text-blue-800",
+  "ANGER": "bg-red-100 text-red-800",
+  "FEAR": "bg-purple-100 text-purple-800",
+  "SURPRISE": "bg-orange-100 text-orange-800",
+  "NEUTRAL": "bg-gray-100 text-gray-800"
 };
 
 function toggleEmotion(emotion) {
@@ -113,6 +113,8 @@ async function saveGT() {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
+        name: currentItem.value.Name,
+        surname: currentItem.value.Surname,
         id: currentItem.value.id,
         gt: selectedGT.value,
       }),
