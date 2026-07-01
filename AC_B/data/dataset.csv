@@ -1,3 +1,12 @@
 Name,Surname,Text,Emotion_Pipeline,Confidence_Pipeline,Emotion_Roberta,Confidence_Roberta,Emotion_Qwen,agreement,G_T
 ma,nu,today i have a exam,neutral,0.9193745851516724,"['sadness', 'surprise', 'joy']","[0.33712953329086304, 0.30295783281326294, 0.22553494572639465]",neutral,partial, neutral
 ma,nu,i love you Lola,joy,0.9996703863143921,"['joy', 'sadness', 'surprise']","[0.964901328086853, 0.021603375673294067, 0.008267385885119438]",joy,full, joy
+ma,nu,im happy,joy,0.999421238899231,"['joy', 'surprise', 'sadness']","[0.9676284193992615, 0.019154246896505356, 0.008550557307898998]",joy,full,
+ma,nu,sad,sadness,0.9858205318450928,"['sadness', 'surprise', 'neutral']","[0.919236421585083, 0.04836713895201683, 0.018496882170438766]",sadness,full,
+ma,nu,im sad,sadness,0.989905059337616,"['sadness', 'surprise', 'joy']","[0.986750066280365, 0.006776663940399885, 0.002428281120955944]",sadness,full,
+ma,nu,blind,neutral,0.9741491675376892,"['neutral', 'sadness', 'surprise']","[0.40138548612594604, 0.2599737048149109, 0.14449332654476166]",neutral,full,
+ma,nu,sad,sadness,0.9858205318450928,"['sadness', 'surprise', 'neutral']","[0.919236421585083, 0.04836713895201683, 0.018496882170438766]",sadness,full,
+ma,nu,sad,sadness,0.9858205318450928,"['sadness', 'surprise', 'neutral']","[0.919236421585083, 0.04836713895201683, 0.018496882170438766]",sadness,full,
+ma,nu,ciao,neutral,0.9905407428741455,"['neutral', 'surprise', 'sadness']","[0.824094295501709, 0.07455617934465408, 0.043954066932201385]",neutral,full,
+ma,nu,im focus ,neutral,0.6951472163200378,"['fear', 'anger', 'joy']","[0.5874564051628113, 0.2530059814453125, 0.07571105659008026]",neutral,partial,
+ma,nu,im anger with  my mom,anger,0.9177735447883606,"['anger', 'sadness', 'joy']","[0.9756156802177429, 0.015759993344545364, 0.0033233403228223324]",anger,full,

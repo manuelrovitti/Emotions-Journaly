@@ -3,7 +3,7 @@
 
     <div class="rounded-2xl bg-white p-6 shadow-sm">
       <h2 class="mb-2 text-2xl font-semibold">
-        Dashboard di {{ props.name }} {{ props.surname }}
+        Dashboard {{ props.name }} {{ props.surname }}
       </h2>
 
       <div class="grid grid-cols-2 gap-4">
@@ -11,7 +11,7 @@
         <!-- TOTALI -->
         <div class="rounded-xl bg-indigo-50 p-4">
           <p class="text-sm text-slate-600">
-            Analisi Totali
+            Analytical Total
           </p>
 
           <p class="mt-2 text-3xl font-bold">
@@ -19,38 +19,83 @@
           </p>
         </div>
 
-        <!-- DOMINANTE -->
-        <div class="rounded-xl bg-green-50 p-4">
-          <p class="text-sm text-slate-600">
-            Felicità 
-          </p>
-
-          <p class="mt-2 text-3xl font-bold">
-            {{ stats.happy }}%
-          </p>
-        </div>
-
-        <!-- HAPPINESS -->
+        <!-- JOY -->
         <div class="rounded-xl bg-yellow-50 p-4">
           <p class="text-sm text-slate-600">
-            Altre 
+            JOY 😂
           </p>
 
           <p class="mt-2 text-3xl font-bold">
-            {{ stats.other }}%
+            {{ stats.joy }}%
           </p>
         </div>
 
         <!-- SADNESS -->
-        <div class="rounded-xl bg-red-50 p-4">
+        <div class="rounded-xl bg-blue-50 p-4">
           <p class="text-sm text-slate-600">
-            Tristezza
+            SADNESS 😞
           </p>
 
           <p class="mt-2 text-3xl font-bold">
-            {{ stats.sad }}%
+            {{ stats.sadness }}%
           </p>
         </div>
+
+        <!-- ANGER -->
+        <div class="rounded-xl bg-red-50 p-4">
+          <p class="text-sm text-slate-600">
+            ANGER 😡
+          </p>
+
+          <p class="mt-2 text-3xl font-bold">
+            {{ stats.anger }}%
+          </p>
+        </div>
+
+        <!-- FEAR -->
+        <div class="rounded-xl bg-purple-50 p-4">
+          <p class="text-sm text-slate-600">
+            FEAR 😱
+          </p>
+
+          <p class="mt-2 text-3xl font-bold">
+            {{ stats.fear }}%
+          </p>
+        </div>
+
+        <!-- DISGUST -->
+        <div class="rounded-xl bg-green-50 p-4">
+          <p class="text-sm text-slate-600">
+            DISGUST 🤮
+          </p>
+
+          <p class="mt-2 text-3xl font-bold">
+            {{ stats.disgust }}%
+          </p>
+        </div>
+
+        <!-- SURPRISE -->
+        <div class="rounded-xl bg-orange-50 p-4">
+          <p class="text-sm text-slate-600">
+            SURPRISE 😯
+          </p>
+
+          <p class="mt-2 text-3xl font-bold">
+            {{ stats.surprise }}%
+          </p>
+        </div>
+
+        <!-- NEUTRAL -->
+        <div class="rounded-xl bg-gray-50 p-4">
+          <p class="text-sm text-slate-600">
+            NEUTRAL 😐
+          </p>
+
+          <p class="mt-2 text-3xl font-bold">
+            {{ stats.neutral }}%
+          </p>
+        </div>
+        
 
       </div>
     </div>
@@ -90,17 +135,73 @@ async function loadHistory() {
   history.value = data;
 }
 
+/* =========================
+   PARSER ROBERTA 
+========================= */
+const parseEmotionList = (str) => {
+  if (!str) return [];
+
+  // già array?
+  if (Array.isArray(str)) return str;
+
+  try {
+    return JSON.parse(str);
+  } catch {
+    try {
+      return JSON.parse(str.replace(/'/g, '"'));
+    } catch {
+      return [];
+    }
+  }
+};
+
+const firstEmotion = (row) => parseEmotionList(row["Emotion_Roberta"])[0];
+
+/* =========================
+   MAJORITY EMOTION
+========================= */
+const getMajorityEmotion = (row) => {
+  const emotions = [
+    row.Emotion_Pipeline,
+    row.Emotion_Qwen,
+    firstEmotion(row)
+  ];
+
+  const counts = {};
+
+  for (const e of emotions) {
+    if (!e) continue;
+    counts[e] = (counts[e] || 0) + 1;
+  }
+
+  for (const [emotion, count] of Object.entries(counts)) {
+    if (count >= 2) return emotion;
+  }
+
+  return null; 
+};
+
 const total = computed(() => history.value.length);
+
+/* =========================
+   COMPUTED PROPERTIES
+========================= */
 
 const stats = computed(() => {
   const counts = {
     joy: 0,
-    other: 0,
     sadness: 0,
+    anger: 0,
+    fear: 0,
+    surprise: 0,
+    disgust: 0,
+    neutral: 0
   };
 
-  for (const emotion of history.value || []) {
-    if (counts[emotion] !== undefined) {
+  for (const row of history.value || []) {
+    const emotion = getMajorityEmotion(row);
+
+    if (emotion && counts[emotion] !== undefined) {
       counts[emotion]++;
     }
   }
@@ -108,9 +209,13 @@ const stats = computed(() => {
   const total = history.value.length || 1;
 
   return {
-    happy: Math.round((counts.joy / total) * 100),
-    other: Math.round((((total - counts.joy) - counts.sadness) / total) * 100),
-    sad: Math.round((counts.sadness / total) * 100),
+    joy: Math.round((counts.joy / total) * 100),
+    sadness: Math.round((counts.sadness / total) * 100),
+    anger: Math.round((counts.anger / total) * 100),
+    fear: Math.round((counts.fear / total) * 100),
+    surprise: Math.round((counts.surprise / total) * 100),
+    disgust: Math.round((counts.disgust / total) * 100),
+    neutral: Math.round((counts.neutral / total) * 100),
   };
 });
 
