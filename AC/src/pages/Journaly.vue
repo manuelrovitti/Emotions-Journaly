@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, watch } from "vue";
 import { useSiteStore } from '../stores/HomeStore'
 
 const store = useSiteStore()
@@ -59,6 +59,72 @@ function previousItem() {
 function nextItem() {
   if (currentIndex.value < history.value.length - 1) {
     currentIndex.value++;
+  }
+}
+
+/*=========================
+  SELECT EMOTION  
+=========================*/
+const selectedGT = ref([]);
+
+const emotions = [
+  "JOY 😂",
+  "SADNESS 😞",
+  "ANGER 😡",
+  "FEAR 😱",
+  "SURPRISE 😯",
+  "NEUTRAL 😐"
+];
+
+const emotionsColors = {
+  "JOY 😂": "bg-yellow-100 text-yellow-800",
+  "SADNESS 😞": "bg-blue-100 text-blue-800",
+  "ANGER 😡": "bg-red-100 text-red-800",
+  "FEAR 😱": "bg-purple-100 text-purple-800",
+  "SURPRISE 😯": "bg-orange-100 text-orange-800",
+  "NEUTRAL 😐": "bg-gray-100 text-gray-800"
+};
+
+function toggleEmotion(emotion) {
+  const index = selectedGT.value.indexOf(emotion);
+
+  if (index !== -1) {
+    selectedGT.value.splice(index, 1);
+    return;
+  }
+
+  // max 3
+  if (selectedGT.value.length >= 3) return;
+
+  selectedGT.value.push(emotion);
+}
+
+const maxReached = computed(() => selectedGT.value.length >= 3);
+
+watch(currentIndex, () => {
+  selectedGT.value = [];
+});
+
+async function saveGT() {
+  try {
+    const response = await fetch("http://localhost:8000/save-gt", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        id: currentItem.value.id,
+        gt: selectedGT.value,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error("Errore nel salvataggio GT");
+    }
+
+    currentItem.value.G_T = [...selectedGT.value];
+  } catch (err) {
+    error.value = err.message;
   }
 }
 
@@ -182,6 +248,58 @@ function nextItem() {
 
             </div>
 
+          </div>
+          <div v-else class="mt-6">
+            <h4 class="font-semibold mb-2">
+              Seleziona Ground Truth (max 3, in ordine)
+            </h4>
+
+            <div class="flex flex-wrap gap-2">
+              <button
+                v-for="emotion in emotions"
+                :key="emotion"
+                @click="toggleEmotion(emotion)"
+                class="px-3 py-2 rounded border"
+                :disabled="!selectedGT.includes(emotion) && maxReached"
+                :class="[
+                  selectedGT.includes(emotion)
+                    ? emotionsColors[emotion]
+                    : 'bg-white hover:bg-gray-100',
+                  !selectedGT.includes(emotion) && maxReached
+                    ? 'opacity-50 cursor-not-allowed'
+                    : ''
+                ]"
+              >
+                {{ emotion }}
+              </button>
+            </div>
+
+            <div class="mt-3 text-sm text-gray-600">
+              Ordine selezionato:
+            </div>
+
+            <div class="flex gap-2 mt-1">
+              <span
+                v-for="(e, i) in selectedGT"
+                :key="i"
+                class="px-2 py-1 bg-gray-200 rounded"
+                :class="emotionsColors[e]"
+              >
+                {{ i + 1 }}. {{ e }}
+              </span>
+            </div>
+
+            <button
+              class="mt-4 bg-green-600 text-white px-4 py-2 rounded disabled:opacity-50"
+              :disabled="selectedGT.length === 0"
+              @click="saveGT"
+            >
+              Salva Ground Truth
+            </button>
+
+            <p v-if="maxReached" class="text-sm text-red-500 mt-2">
+              Hai raggiunto il limite massimo di 3 emozioni
+            </p>
           </div>
 
         </div>
