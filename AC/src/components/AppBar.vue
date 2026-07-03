@@ -18,12 +18,12 @@ const navLinks = [
   <!-- NAVBAR FULL WIDTH -->
   <nav class="sticky top-0 z-50 w-screen bg-blue-200 backdrop-blur-xl border-b border-red-900/10">
 
-    <!-- FULL WIDTH CONTENT (NO LIMITI) -->
+    <!-- FULL WIDTH CONTENT-->
     <div class="w-full px-6 lg:px-10">
 
       <div class="flex items-center justify-between h-20">
 
-        <!-- LEFT: LOGO + BRAND -->
+        <!-- LOGO-->
         <router-link to="/" class="flex items-center gap-3">
           <img
             src="../assets/diario.png"
@@ -36,7 +36,7 @@ const navLinks = [
           </span>
         </router-link>
 
-        <!-- RIGHT: DESKTOP NAV -->
+        <!-- DESKTOP NAV -->
         <div class="hidden md:flex items-center gap-10">
           <a
             v-for="link in navLinks"

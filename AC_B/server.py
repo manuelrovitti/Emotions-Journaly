@@ -3,8 +3,8 @@ from pydantic import BaseModel
 from transformers import pipeline
 from fastapi.middleware.cors import CORSMiddleware
 from csv_manager import DATA_DIR, save_analysis, read_analysis, read_history, overwrite_history
-
-import os
+from config import HF_TOKEN
+#import os
 import requests
 import json, csv
 from collections import Counter
@@ -35,6 +35,7 @@ def pipeline_emotion(text:str):
 
     try:
         result_pipeline = ekman_pipeline(text)[0]
+        #print("PIPELINE RAW RESULT:", result_pipeline)
         return result_pipeline
     except Exception as e:
         result = {"label" : "None", "score": 0.0}
@@ -42,7 +43,7 @@ def pipeline_emotion(text:str):
 
 # =========================
 # HF CONFIG
-HF_TOKEN = os.environ.get("HF_TOKEN")
+#HF_TOKEN = os.environ.get("HF_TOKEN")
 EMOTIONS = ["joy", "sadness", "anger", "fear", "surprise", "disgust", "neutral"]
 ROBERTA_URL = "https://router.huggingface.co/hf-inference/models/j-hartmann/emotion-english-distilroberta-base"
 LLM_URL = "https://router.huggingface.co/v1/chat/completions"
@@ -61,7 +62,7 @@ def roberta_api_emotion(text: str):
 
         result = response.json()
 
-        print("HF RAW RESPONSE:", result)
+        #print("HF RAW RESPONSE:", result)
 
         # HF error / loading
         if isinstance(result, dict):
@@ -97,7 +98,7 @@ def roberta_api_emotion(text: str):
         #    "emotion": top["label"][0],
         #    "confidence": float(top["score"][0])
         #}
-        print("top:", top)
+        #print("top:", top)
         return top
 
     except Exception as e:

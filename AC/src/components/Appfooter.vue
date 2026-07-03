@@ -7,7 +7,7 @@ const footerSections = [
     links: [
       { name: 'Home', href: '/' },
       { name: 'About', href: '/about' },
-      { name: 'Diary', href: '/diary' },
+      { name: 'Journaly', href: '/journaly' },
     ],
   },
   {
@@ -15,7 +15,7 @@ const footerSections = [
     links: [
       { name: 'Privacy Policy', href: '#' },
       { name: 'Cookie Policy', href: '#' },
-      { name: 'Termini di Servizio', href: '#' },
+      { name: 'Terms of Service', href: '#' },
     ],
   },
 ]
@@ -25,7 +25,7 @@ const footerSections = [
   <!-- FULL WIDTH FOOTER -->
   <footer class="w-full bg-blue-200 border-t border-red-900/10">
 
-    <!-- CONTENT WRAPPER (CENTRATO MA NON LIMITANTE) -->
+    <!-- CONTENT WRAPPER-->
     <div class="w-full px-6 lg:px-10 py-12 lg:py-16">
 
       <!-- GRID -->
@@ -92,7 +92,7 @@ const footerSections = [
         class="mt-12 pt-8 border-t border-red-900/10 flex flex-col sm:flex-row justify-between items-center gap-4"
       >
         <p class="text-xs text-black">
-          &copy; {{ currentYear }} Emotional Journal. Tutti i diritti riservati.
+          &copy; {{ currentYear }} Emotional Journal. All rights reserved.
         </p>
 
         <p class="text-xs text-black tracking-wide">

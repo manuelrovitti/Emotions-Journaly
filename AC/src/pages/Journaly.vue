@@ -210,7 +210,7 @@ async function saveGT() {
             <div class="grid gap-4 md:grid-cols-3">
 
               <div class="rounded-xl border bg-blue-50 p-4">
-                <h5 class="font-semibold text-blue-700">Pipeline</h5>
+                <h5 class="font-semibold text-blue-700">PIPELINE</h5>
 
                 <p class="mt-2 text-lg font-bold">
                   {{ currentItem.Emotion_Pipeline }}
@@ -223,7 +223,7 @@ async function saveGT() {
               </div>
 
               <div class="rounded-xl border bg-green-50 p-4">
-                <h5 class="font-semibold text-green-700">RoBERTa</h5>
+                <h5 class="font-semibold text-green-700">ROBERTA</h5>
 
                 <p class="mt-2 text-lg font-bold">
                   {{ currentItem.Emotion_Roberta }}
@@ -241,7 +241,7 @@ async function saveGT() {
               </div>
 
               <div class="rounded-xl border bg-purple-50 p-4">
-                <h5 class="font-semibold text-purple-700">Qwen</h5>
+                <h5 class="font-semibold text-purple-700">QWEN</h5>
 
                 <p class="mt-2 text-lg font-bold">
                   {{ currentItem.Emotion_Qwen }}
@@ -253,7 +253,7 @@ async function saveGT() {
           </div>
           <div v-else class="mt-6">
             <h4 class="font-semibold mb-2">
-              Seleziona Ground Truth (max 3, in ordine)
+              Select Ground Truth (max 3, in order)
             </h4>
 
             <div class="flex flex-wrap gap-2">
@@ -277,7 +277,7 @@ async function saveGT() {
             </div>
 
             <div class="mt-3 text-sm text-gray-600">
-              Ordine selezionato:
+              Selected Emotions (in order):
             </div>
 
             <div class="flex gap-2 mt-1">
@@ -296,11 +296,11 @@ async function saveGT() {
               :disabled="selectedGT.length === 0"
               @click="saveGT"
             >
-              Salva Ground Truth
+              Save Ground Truth
             </button>
 
             <p v-if="maxReached" class="text-sm text-red-500 mt-2">
-              Hai raggiunto il limite massimo di 3 emozioni
+              You have reached the maximum limit of 3 emotions.
             </p>
           </div>
 

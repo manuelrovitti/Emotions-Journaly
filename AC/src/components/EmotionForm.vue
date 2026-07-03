@@ -175,9 +175,6 @@ async function submitForm() {
 
     emotion_qwen.value = data.emotion_qwen;
 
-
-
-    /* ✅ EMIT AL PARENT */
     emit("analyze", {
       name: form.value.name,
       surname: form.value.surname,
