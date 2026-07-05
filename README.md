@@ -25,6 +25,7 @@ To test it, a Docker environment was created.
 Two terminals are opened: one is used to access the frontend, and the other is used to access the backend.
 
 In AC:
+(grafici) => npm install chart.js vue-chartjs
 - npm run dev -- --host
 
 In AC_B:
