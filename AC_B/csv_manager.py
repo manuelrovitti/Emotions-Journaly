@@ -22,18 +22,18 @@ FIELDNAMES = [
     "G_T"
 ]
 
-
+#========================
+# SAVE ANALYSIS CSV
 def save_analysis(name, surname, text, emotion_pipeline, confidence_pipeline, emotion_roberta, confidence_roberta, emotion_qwen, agreement, gt=""):
 
     file_exists = FILE_NAME.exists()
     new_id = str(uuid.uuid4())
 
-     # normalizza GT
+    
     if isinstance(gt, list):
         gt = json.dumps(gt, ensure_ascii=False)
     elif isinstance(gt, str):
         try:
-            # evita doppia serializzazione tipo "['SADNESS']"
             parsed = json.loads(gt)
             gt = json.dumps(parsed, ensure_ascii=False) if isinstance(parsed, list) else gt
         except:
@@ -77,6 +77,8 @@ def save_analysis(name, surname, text, emotion_pipeline, confidence_pipeline, em
             gt
         ])
 
+#========================
+# READ CSV DASHBOARD
 def read_analysis(name=None, surname=None):
     if not FILE_NAME.exists():
         return []
@@ -105,7 +107,8 @@ def read_analysis(name=None, surname=None):
 
         return results
     
-    
+#========================
+# READ CSV HISTORY
 def read_history(name=None, surname=None):
     if not FILE_NAME.exists():
         return []
@@ -133,7 +136,8 @@ def read_history(name=None, surname=None):
 
         return history
     
-    
+#========================
+# OVERWRITE CSV HISTORY
 def overwrite_history(data):
     if not data:
         return

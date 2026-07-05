@@ -72,6 +72,7 @@ const emotions = [
   "SADNESS",
   "ANGER",
   "FEAR",
+  "DISGUST",
   "SURPRISE",
   "NEUTRAL"
 ];
@@ -81,6 +82,7 @@ const emotionsColors = {
   "SADNESS": "bg-blue-100 text-blue-800",
   "ANGER": "bg-red-100 text-red-800",
   "FEAR": "bg-purple-100 text-purple-800",
+  "DISGUST": "bg-green-100 text-green-800",
   "SURPRISE": "bg-orange-100 text-orange-800",
   "NEUTRAL": "bg-gray-100 text-gray-800"
 };

@@ -9,7 +9,7 @@
     class="min-h-screen flex items-center justify-center bg-cover bg-center p-6"
     :style="{ backgroundImage: `url(${store.bgImage})` }"
   >
-    <!-- CARD GRANDE -->
+    <!-- CARD TEXT-->
     <div class="w-full max-w-6xl bg-blue-200/90 backdrop-blur-md rounded-3xl shadow-2xl p-12 text-center">
       
       <h1 class="text-5xl font-bold mb-6 text-green-900">

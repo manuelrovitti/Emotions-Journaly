@@ -64,14 +64,12 @@ def roberta_api_emotion(text: str):
 
         #print("HF RAW RESPONSE:", result)
 
-        # HF error / loading
         if isinstance(result, dict):
             return {
                 "emotion": None,
                 "confidence": 0.0,
             }
 
-        # empty response
         if not isinstance(result, list) or len(result) == 0:
             return {
                 "emotion": None,
@@ -80,7 +78,6 @@ def roberta_api_emotion(text: str):
 
         emotions = result[0]
 
-        # safe max (ignore broken entries)
         valid = [
             e for e in emotions
             if isinstance(e, dict) and "label" in e and "score" in e
@@ -255,14 +252,14 @@ def get_history(name:str, surname:str):
 # SAVE G_T
 @app.post("/save-gt")
 def save_gt(data: GTRequest):
-
-    # 1. leggi CSV vero (NON read_history)
+    if not FILE_NAME.exists():
+        return {"status": "error", "message": "File CSV non trovato"}
+    
     with open(FILE_NAME, "r", newline="", encoding="utf-8") as file:
         rows = list(csv.DictReader(file))
 
     found = False
 
-    # 2. aggiorna SOLO la riga giusta
     for row in rows:
         if row["id"] == data.id:
             row["G_T"] = json.dumps(data.gt, ensure_ascii=False)
@@ -272,7 +269,6 @@ def save_gt(data: GTRequest):
     if not found:
         return {"status": "error", "message": "ID non trovato"}
 
-    # 3. riscrivi SOLO UNA VOLTA
     overwrite_history(rows)
 
     return {"status": "ok"}
