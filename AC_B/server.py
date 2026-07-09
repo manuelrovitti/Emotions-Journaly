@@ -26,20 +26,23 @@ app.add_middleware(
 # MODELLO LOCALE
 ekman_pipeline = pipeline(
     "sentiment-analysis",
-    model="arpanghoshal/EkmanClassifier"
+    model="arpanghoshal/EkmanClassifier",
+    top_k=3
 )
 
 #==========================
 # PIPELINE
-def pipeline_emotion(text:str):
+def pipeline_emotion(text: str):
 
     try:
-        result_pipeline = ekman_pipeline(text)[0]
-        #print("PIPELINE RAW RESULT:", result_pipeline)
-        return result_pipeline
-    except Exception as e:
-        result = {"label" : "None", "score": 0.0}
-        return result
+
+        result_pipeline = ekman_pipeline(text)
+
+        return result_pipeline[0]
+
+    except Exception:
+
+        return []
 
 # =========================
 # HF CONFIG
@@ -106,44 +109,80 @@ def roberta_api_emotion(text: str):
 
 #==========================
 # API QWEN  
-def qwen_api_emotion(text:str):
+def qwen_api_emotion(text: str):
+
     try:
-        responce = requests.post(
+
+        response = requests.post(
             LLM_URL,
-            headers = HEADERS,
-            json= {
-                "model" : "Qwen/Qwen2.5-7B-Instruct",
+            headers=HEADERS,
+            json={
+
+                "model": "Qwen/Qwen2.5-7B-Instruct",
+
                 "messages": [
                     {
                         "role": "user",
-                        "content": f"""Return only one emotion: joy, sadness, anger, fearr, surprise, disgust, neutral. Text: {text}"""
+                        "content": f"""
+Analyze the emotion of this text.
+
+Return ONLY a JSON array with the 3 most likely emotions.
+
+Allowed emotions:
+joy, sadness, anger, fear, surprise, disgust, neutral
+
+Format:
+
+[
+  {{
+    "emotion": "emotion_name",
+    "confidence": 0.0
+  }},
+  {{
+    "emotion": "emotion_name",
+    "confidence": 0.0
+  }},
+  {{
+    "emotion": "emotion_name",
+    "confidence": 0.0
+  }}
+]
+
+The sum of confidence values must be 1.
+
+Text:
+{text}
+"""
                     }
                 ],
+
                 "temperature":0.0
+
             },
+
             timeout=10
         )
-        emotion = responce.json()["choices"][0]["message"]["content"]
 
-        return {
-            "emotion": clean_emotion(emotion),
-            "confidence": 0.0,
-        }
+
+        content = response.json()["choices"][0]["message"]["content"]
+        content = content.replace("```json","")
+        content = content.replace("```","")
+        content = content.strip()
+
+        emotions = json.loads(content)
+
+        return emotions
 
     except Exception as e:
-        return {
-            "emotion": None,
-            "confidence": 0.0,
-        }
 
-#==========================
-# CLEAN OUTPUT QWEN
-def clean_emotion(text: str):
-    text = text.lower()
-    for e in EMOTIONS:
-        if e in text:
-            return e
-    return "All"
+        print("QWEN ERROR:", e)
+
+        return [
+            {
+                "emotion": None,
+                "confidence":0.0
+            }
+        ]
 
 #==========================
 # AGREEMENT
@@ -167,6 +206,9 @@ class InputText(BaseModel):
     surname: str
     text: str
 
+    emotion: list[str]
+    intensity: list[float]
+
 #=========================
 # G_T
 class GTRequest(BaseModel):
@@ -183,19 +225,19 @@ def analyze(data: InputText):
     #======================
     # LOCAL PIPELINE
     result_pipeline = pipeline_emotion(data.text)
-    emotion_pipeline = result_pipeline["label"]
-    confidence_pipeline = float(result_pipeline["score"])
+    emotions_pipeline = [e["label"] for e in result_pipeline]
+    confidences_pipeline = [float(e["score"])for e in result_pipeline]
     print("\n PIPELINE RESULT:", result_pipeline)
     
     # =====================
     # API RROBERTA
     result_roberta = roberta_api_emotion(data.text)
     emotions_roberta = [e["label"] for e in result_roberta]
-    emotion_roberta1 = result_roberta[0]["label"] or "unavailable"
+    #emotion_roberta1 = result_roberta[0]["label"] or "unavailable"
     #emotion_roberta2 = result_roberta[1]["label"] or "unavailable"
     #emotion_roberta3 = result_roberta[2]["label"] or "unavailable"
     confidences_roberta = [e["score"] for e in result_roberta]
-    confidence_roberta1 = float(result_roberta[0]["score"])
+    #confidence_roberta1 = float(result_roberta[0]["score"])
     #confidence_roberta2 = float(result_roberta[1]["score"])
     #confidence_roberta3 = float(result_roberta[2]["score"])
     print("\n ROBERTA RESULT:", result_roberta)
@@ -203,12 +245,13 @@ def analyze(data: InputText):
     #======================
     # API QWEN
     result_qwen = qwen_api_emotion(data.text)
-    emotion_qwen = result_qwen["emotion"]
+    emotions_qwen = [e["emotion"]for e in result_qwen]
+    confidences_qwen = [float(e["confidence"])for e in result_qwen]
     print("\n QWEN RESULT:", result_qwen)
 
     # =====================
     # AGREEMENT
-    agreement = aggrement(emotion_pipeline, emotion_roberta1, emotion_qwen)
+    agreement = aggrement(emotions_pipeline[0], emotions_roberta[0], emotions_qwen[0])
 
     # =====================
     # SAVE CSV
@@ -216,23 +259,44 @@ def analyze(data: InputText):
         data.name,
         data.surname,
         data.text,
-        emotion_pipeline,
-        confidence_pipeline,
+
+        # MODEL OUTPUT
+        emotions_pipeline,
+        confidences_pipeline,
+
         emotions_roberta,
         confidences_roberta,
-        emotion_qwen,
-        agreement
+
+        emotions_qwen,
+        confidences_qwen,
+
+        agreement,
+
+        # HUMAN GROUND TRUTH
+        data.emotion,
+        data.intensity
     )
 
     # =====================
     # RESPONSE
     return {
-        "emotion_pipeline": emotion_pipeline,
-        "confidence_pipeline": confidence_pipeline,
-        "emotion_roberta": emotion_roberta1,
-        "confidence_roberta": confidence_roberta1,
-        "emotion_qwen": emotion_qwen,
+
+        "emotion_pipeline": emotions_pipeline,
+        "confidence_pipeline": confidences_pipeline,
+
+        "emotion_roberta": emotions_roberta[0],
+        "confidence_roberta": confidences_roberta[0],
+
+        "emotion_qwen": emotions_qwen[0],
+        "confidence_qwen": confidences_qwen[0],
+
         "agreement": agreement,
+
+
+        # HUMAN LABEL
+        "emotion_gt": data.emotion,
+        "intensity_gt": data.intensity
+
     }
 
 

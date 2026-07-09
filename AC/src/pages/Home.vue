@@ -17,7 +17,7 @@
       HANDLER
     ========================= */
     function handleAnalyze(data) {
-      console.log(data);
+      console.log("Analyze data:", data);
 
       currentUser.value.name = data.name;
       currentUser.value.surname = data.surname;
