@@ -135,52 +135,6 @@ async function loadHistory() {
   history.value = data;
 }
 
-/* =========================
-   PARSER ROBERTA 
-========================= */
-const parseEmotionList = (str) => {
-  if (!str) return [];
-
-  // già array?
-  if (Array.isArray(str)) return str;
-
-  try {
-    return JSON.parse(str);
-  } catch {
-    try {
-      return JSON.parse(str.replace(/'/g, '"'));
-    } catch {
-      return [];
-    }
-  }
-};
-
-const firstEmotion = (row) => parseEmotionList(row["Emotion_Roberta"])[0];
-
-/* =========================
-   MAJORITY EMOTION
-========================= */
-const getMajorityEmotion = (row) => {
-  const emotions = [
-    row.Emotion_Pipeline,
-    row.Emotion_Qwen,
-    firstEmotion(row)
-  ];
-
-  const counts = {};
-
-  for (const e of emotions) {
-    if (!e) continue;
-    counts[e] = (counts[e] || 0) + 1;
-  }
-
-  for (const [emotion, count] of Object.entries(counts)) {
-    if (count >= 2) return emotion;
-  }
-
-  return null; 
-};
-
 const total = computed(() => history.value.length);
 
 /* =========================
@@ -199,10 +153,9 @@ const stats = computed(() => {
   };
 
   for (const row of history.value || []) {
-    const emotion = getMajorityEmotion(row);
 
-    if (emotion && counts[emotion] !== undefined) {
-      counts[emotion]++;
+    if (counts[row] !== undefined) {
+      counts[row]++;
     }
   }
 

@@ -9,8 +9,8 @@
     const store = useSiteStore()
 
     const currentUser = ref({
-      name: "Mario",
-      surname: "Rossi",
+      name: "sa",
+      surname: "ra",
     });
 
     /* =========================

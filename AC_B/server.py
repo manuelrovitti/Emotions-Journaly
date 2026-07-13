@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 from transformers import pipeline
 from fastapi.middleware.cors import CORSMiddleware
-from csv_manager import DATA_DIR, save_analysis, read_analysis, read_history, overwrite_history
+from csv_manager import DATA_DIR, save_analysis, read_analysis, read_history
 from config import HF_TOKEN
 #import os
 import requests
@@ -186,17 +186,67 @@ Text:
 
 #==========================
 # AGREEMENT
-def aggrement (emo1:str, emo2:str, emo3:str):
-    emotions = [emo1, emo2, emo3]
-    count = Counter(emotions)
-    _, freq = count.most_common(1)[0]
+import numpy as np
 
-    if freq == 3:
-        return "full"
-    elif freq == 2:
-        return "partial"
-    else:
-        return "none"
+
+def agreement(
+    emotions_pipeline: list[dict],
+    emotions_roberta: list[dict],
+    emotions_qwen: list[dict],
+) -> tuple[dict, float]:
+
+    emotion_vocab = [
+        "anger",
+        "disgust",
+        "fear",
+        "joy",
+        "neutral",
+        "sadness",
+        "surprise"
+    ]
+
+
+    def emotion_vector(result):
+        vector = {}
+
+        for emotion in emotion_vocab:
+            confidence = 0.0
+
+            for item in result:
+                label = item.get("label", item.get("emotion"))
+                score = item.get("score", item.get("confidence"))
+
+                if label == emotion:
+                    confidence = score
+                    break
+
+            vector[emotion] = confidence
+
+        return vector
+
+    pipeline_vector = emotion_vector(emotions_pipeline)
+    roberta_vector = emotion_vector(emotions_roberta)
+    qwen_vector = emotion_vector(emotions_qwen)
+
+    agreement_vector = {}
+
+    for emotion in emotion_vocab:
+        agreement_vector[emotion] = (
+            pipeline_vector[emotion] +
+            roberta_vector[emotion] +
+            qwen_vector[emotion]
+        ) / 3
+
+    total = sum(agreement_vector.values())
+
+    if total > 0:
+        for emotion in agreement_vector:
+            agreement_vector[emotion] = (
+                agreement_vector[emotion] / total
+            )
+
+    print(agreement_vector)
+    return agreement_vector
 
 
 # =========================
@@ -251,7 +301,7 @@ def analyze(data: InputText):
 
     # =====================
     # AGREEMENT
-    agreement = aggrement(emotions_pipeline[0], emotions_roberta[0], emotions_qwen[0])
+    score_agreement = agreement(result_pipeline, result_roberta, result_qwen)
 
     # =====================
     # SAVE CSV
@@ -270,7 +320,7 @@ def analyze(data: InputText):
         emotions_qwen,
         confidences_qwen,
 
-        agreement,
+        score_agreement,
 
         # HUMAN GROUND TRUTH
         data.emotion,
@@ -311,28 +361,3 @@ def get_dashboaard(name: str, surname: str):
 @app.get("/history/{name}/{surname}")
 def get_history(name:str, surname:str):
     return read_history(name=name, surname=surname)
-
-#==========================
-# SAVE G_T
-@app.post("/save-gt")
-def save_gt(data: GTRequest):
-    if not FILE_NAME.exists():
-        return {"status": "error", "message": "File CSV non trovato"}
-    
-    with open(FILE_NAME, "r", newline="", encoding="utf-8") as file:
-        rows = list(csv.DictReader(file))
-
-    found = False
-
-    for row in rows:
-        if row["id"] == data.id:
-            row["G_T"] = json.dumps(data.gt, ensure_ascii=False)
-            found = True
-            break
-
-    if not found:
-        return {"status": "error", "message": "ID non trovato"}
-
-    overwrite_history(rows)
-
-    return {"status": "ok"}
