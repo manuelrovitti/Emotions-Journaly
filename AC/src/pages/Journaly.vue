@@ -223,265 +223,246 @@ function getAgreement(value) {
 
 
       <div
-      v-if="history.length"
-      class="mt-8 grid md:grid-cols-4 gap-6"
-      >
+  v-if="history.length"
+  class="mt-8 space-y-8"
+>
 
-<!-- HISTORY LIST -->
+  <!-- HISTORY -->
 
-        <div
-        class="max-h-[700px] overflow-y-auto"
-        >
+  <div>
 
+    <h3 class="font-bold mb-4">
+      History {{ history.length }}
+    </h3>
 
-          <h3 class="font-bold mb-4">
-          History {{history.length}}
-          </h3>
-
-          <div
-          v-for="(item,index) in history"
-          :key="item.id"
-          @click="selectItem(item)"
-          class="border rounded-xl p-4 mb-3 cursor-pointer"
-          :class="
-          selectedItem?.id===item.id
-          ?'bg-indigo-100 border-indigo-500'
-          :'hover:bg-gray-100'
-          "
-          >
-
-
-          <p class="font-bold">
-          #{{index+1}}
-          </p>
-
-
-          <p class="text-sm mt-2">
-          {{item.Text}}
-          </p>
-
-
-
-          <p class="text-xs mt-3 text-gray-600">
-          Emotion GT:
-          {{parseArray(getField(item,'emotion_gt')).join(", ")}}
-          </p>
-
-
-
-        </div>
-
-
-      </div>
-
-<!-- DETAIL -->
-
-        <div
-        v-if="selectedItem"
-
-        class="md:col-span-3"
-        >
-
-
-          <h2 class="text-xl font-bold mb-5">
-          Emotion Analysis
-          </h2>
-
-
-
-
-          <div class="bg-gray-100 rounded-xl p-5 mb-5">
-          {{selectedItem.Text}}
-          </div>
-
-          <!-- AGREEMENT -->
-
-          <div class="mb-6">
-
-
-            <h3 class="font-bold">
-            Agreement Top 3
-            </h3>
-
-
-            <div
-            v-for="(a,index) in getAgreement(getField(selectedItem,'agreement'))"
-            :key="index"
-            >
-
-            {{index+1}}.
-            {{a.emotion}}
-
-            -
-
-            {{(a.value*100).toFixed(2)}}%
-
-            </div>
-
-
-          </div>
-
-
-          <div class="grid md:grid-cols-3 gap-4">
-
-          <!-- PIPELINE -->
-
-          <div class="bg-blue-50 border rounded-xl p-4">
-
-            <h3 class="font-bold text-blue-700 mb-3">
-            PIPELINE
-            </h3>
-
-
-            <div
-            v-for="(e,i) in parseArray(getField(selectedItem,'Emotion_Pipeline'))"
-            :key="i"
-            class="flex justify-between"
-            >
-
-
-              <span>
-              {{e}}
-              </span>
-
-
-              <span>
-
-              {{(
-              parseArray(getField(selectedItem,'Confidence_Pipeline'))[i]
-              *100
-              ).toFixed(2)}}%
-
-              </span>
-
-
-            </div>
-
-
-          </div>
-
-
-          <!-- ROBERTA -->
-
-
-          <div class="bg-green-50 border rounded-xl p-4">
-
-
-            <h3 class="font-bold text-green-700 mb-3">
-            ROBERTA
-            </h3>
-
-
-            <div
-            v-for="(e,i) in parseArray(getField(selectedItem,'Emotion_Roberta'))"
-            :key="i"
-            class="flex justify-between"
-            >
-
-
-              <span>
-              {{e}}
-              </span>
-
-
-              <span>
-              {{(
-              parseArray(getField(selectedItem,'Confidence_Roberta'))[i]
-              *100
-              ).toFixed(2)}}%
-              </span>
-
-
-            </div>
-
-
-          </div>
-
-          <!-- QWEN -->
-
-          <div class="bg-purple-50 border rounded-xl p-4">
-
-
-            <h3 class="font-bold text-purple-700 mb-3">
-            QWEN
-            </h3>
-
-
-
-            <div
-            v-for="(e,i) in parseArray(getField(selectedItem,'Emotion_Qwen'))"
-            :key="i"
-            class="flex justify-between"
-            >
-
-
-            <span>
-            {{e}}
-            </span>
-
-
-            <span>
-            {{(
-            parseArray(getField(selectedItem,'Confidence_Qwen'))[i]
-            *100
-            ).toFixed(2)}}%
-            </span>
-
-
-          </div>
-
-
-        </div>
-
-
-
-      </div>
-
-      <!-- GT -->
-
+    <div class="max-h-[500px] overflow-y-auto border rounded-xl p-4">
 
       <div
-      class="mt-6 bg-yellow-50 border rounded-xl p-5"
+        v-for="(item,index) in history"
+        :key="item.id"
+        @click="selectItem(item)"
+        class="border rounded-xl p-4 mb-3 cursor-pointer transition-all duration-200"
+        :class="
+          selectedItem?.id===item.id
+            ? 'bg-indigo-100 border-indigo-500 shadow'
+            : 'hover:bg-gray-50'
+        "
       >
 
+        <div class="flex justify-between items-start gap-6">
 
-        <h3 class="font-bold text-yellow-700">
-        Ground Truth
-        </h3>
+          <div class="flex-1">
 
+            <p class="font-bold">
+              #{{ index + 1 }}
+            </p>
 
-        <div
+            <p class="text-gray-700 mt-2 line-clamp-2">
+              {{ item.Text }}
+            </p>
 
-        v-for="(e,i) in parseArray(getField(selectedItem,'emotion_gt'))"
+          </div>
 
-        :key="i"
+          <div class="text-right shrink-0">
 
-        class="flex justify-between mt-2"
+            <p class="text-xs text-gray-500">
+              Ground Truth
+            </p>
 
-        >
+            <p class="font-semibold">
+              {{ parseArray(getField(item,'emotion_gt')).join(", ") }}
+            </p>
 
-
-          <span>
-          {{e}}
-          </span>
-
-
-          <span>
-
-          {{(
-          parseArray(getField(selectedItem,'intensity_gt'))[i]
-          *100
-          ).toFixed(1)}}%
-
-          </span>
-
+          </div>
 
         </div>
 
+      </div>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- DETAILS -->
+
+  <div
+    v-if="selectedItem"
+    class="border-t pt-8"
+  >
+
+    <h2 class="text-2xl font-bold mb-5">
+      Emotion Analysis
+    </h2>
+
+    <div class="bg-gray-100 rounded-xl p-5 mb-6">
+      {{ selectedItem.Text }}
+    </div>
+
+
+
+    <!-- AGREEMENT -->
+
+    <div class="mb-8">
+
+      <h3 class="font-bold mb-3">
+        Agreement Top 3
+      </h3>
+
+      <div
+        v-for="(a,index) in getAgreement(getField(selectedItem,'agreement'))"
+        :key="index"
+        class="flex justify-between border-b py-2"
+      >
+
+        <span>
+          {{ index + 1 }}. {{ a.emotion }}
+        </span>
+
+        <span class="font-semibold">
+          {{ (a.value*100).toFixed(2) }}%
+        </span>
 
       </div>
+
     </div>
+
+
+
+    <div class="grid md:grid-cols-3 gap-5">
+
+      <!-- PIPELINE -->
+
+      <div class="bg-blue-50 border rounded-xl p-4">
+
+        <h3 class="font-bold text-blue-700 mb-3">
+          PIPELINE
+        </h3>
+
+        <div
+          v-for="(e,i) in parseArray(getField(selectedItem,'Emotion_Pipeline'))"
+          :key="i"
+          class="flex justify-between py-1"
+        >
+
+          <span>{{ e }}</span>
+
+          <span>
+
+            {{
+              (
+                parseArray(getField(selectedItem,'Confidence_Pipeline'))[i] * 100
+              ).toFixed(2)
+            }}%
+
+          </span>
+
+        </div>
+
+      </div>
+
+
+
+      <!-- ROBERTA -->
+
+      <div class="bg-green-50 border rounded-xl p-4">
+
+        <h3 class="font-bold text-green-700 mb-3">
+          ROBERTA
+        </h3>
+
+        <div
+          v-for="(e,i) in parseArray(getField(selectedItem,'Emotion_Roberta'))"
+          :key="i"
+          class="flex justify-between py-1"
+        >
+
+          <span>{{ e }}</span>
+
+          <span>
+
+            {{
+              (
+                parseArray(getField(selectedItem,'Confidence_Roberta'))[i] * 100
+              ).toFixed(2)
+            }}%
+
+          </span>
+
+        </div>
+
+      </div>
+
+
+
+      <!-- QWEN -->
+
+      <div class="bg-purple-50 border rounded-xl p-4">
+
+        <h3 class="font-bold text-purple-700 mb-3">
+          QWEN
+        </h3>
+
+        <div
+          v-for="(e,i) in parseArray(getField(selectedItem,'Emotion_Qwen'))"
+          :key="i"
+          class="flex justify-between py-1"
+        >
+
+          <span>{{ e }}</span>
+
+          <span>
+
+            {{
+              (
+                parseArray(getField(selectedItem,'Confidence_Qwen'))[i] * 100
+              ).toFixed(2)
+            }}%
+
+          </span>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+
+    <!-- GROUND TRUTH -->
+
+    <div class="mt-8 bg-yellow-50 border rounded-xl p-5">
+
+      <h3 class="font-bold text-yellow-700 mb-4">
+        Ground Truth
+      </h3>
+
+      <div
+        v-for="(e,i) in parseArray(getField(selectedItem,'emotion_gt'))"
+        :key="i"
+        class="flex justify-between py-2 border-b last:border-0"
+      >
+
+        <span>{{ e }}</span>
+
+        <span>
+
+          {{
+            (
+              parseArray(getField(selectedItem,'intensity_gt'))[i] * 100
+            ).toFixed(1)
+          }}%
+
+        </span>
+
+      </div>
+
+    </div>
+
   </div>
+
+</div>
 </div>
 
 
