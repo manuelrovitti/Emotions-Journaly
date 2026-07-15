@@ -79,7 +79,7 @@
 
 
         <!-- EMOTION PICKER -->
-        <div class="mt-5 grid grid-cols-3 md:grid-cols-6 gap-3">
+        <div class="mt-5 grid grid-cols-3 md:grid-cols-7 gap-3">
 
           <button
             v-for="emotion in emotions"
@@ -183,6 +183,11 @@ const emotions = [
     name:"fear",
     emoji:"😨"
   },
+  {
+    name: "disgust",
+    emoji: "🤮"
+
+  },
 
   {
     name:"surprise",
@@ -252,14 +257,6 @@ async function submitForm(){
 
 
   loading.value = true;
-
-
-
-  /*
-    CONVERT INTENSITY 1-10
-    INTO DISTRIBUTION 0-1
-    SUM = 1
-  */
 
   const rawIntensities = selections.value.map(
     item => Number(item.intensity)

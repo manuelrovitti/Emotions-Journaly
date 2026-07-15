@@ -22,7 +22,7 @@
         <!-- JOY -->
         <div class="rounded-xl bg-yellow-50 p-4">
           <p class="text-sm text-slate-600">
-            JOY 😂
+            JOY 😀
           </p>
 
           <p class="mt-2 text-3xl font-bold">
